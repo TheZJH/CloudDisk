@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>测试</title>
+</head>
+<body>
+<div class="title" align="center">
+    <h1>CloudDisk</h1>
+</div>
+<div align="center" class="login-mid">
+    <p>
+        <span th:text="${session.msg}"></span>
+    </p>
+    <form th:action="@{/login}" method="post">
+
+        <div class="username">
+            <input type="text" id="username" name="username" placeholder="用户名">
+        </div>
+
+        <div class="password">
+            <input type="password" id="password" name="password" placeholder="密码">
+        </div>
+        <div class="login">
+            <input type="submit" value="登录">
+        </div>
+    </form>
+</div>
+</body>
+</html>
