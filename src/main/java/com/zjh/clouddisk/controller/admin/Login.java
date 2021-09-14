@@ -1,4 +1,4 @@
-package com.zjh.clouddisk.controller;
+package com.zjh.clouddisk.controller.admin;
 
 
 import com.obs.services.ObsClient;
@@ -50,7 +50,7 @@ public class Login {
             session.setAttribute("realname", login.getRealname());
             //重定向防止表单重复提交
             Integer state = login.getState();
-
+            //判断是否是管理员
             if (state.equals(1)) {
                 return "redirect:/index";
             }
@@ -63,6 +63,9 @@ public class Login {
             session.setAttribute("msg", "用户名或密码错误");
             return "login";
         }
-
+    }
+    @GetMapping("/index")
+    public String index(){
+        return "index";
     }
 }

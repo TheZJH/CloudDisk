@@ -1,4 +1,4 @@
-package com.zjh.clouddisk.controller;
+package com.zjh.clouddisk.controller.admin;
 
 import com.zjh.clouddisk.dao.User;
 import org.springframework.stereotype.Controller;
