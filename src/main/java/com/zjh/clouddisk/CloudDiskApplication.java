@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = {"com.zjh.clouddisk"})
 //扫描mybatis接口文件
-@MapperScan("com.zjh.clouddisk.model")
+@MapperScan("com.zjh.clouddisk.mapper")
 public class CloudDiskApplication {
 
     public static void main(String[] args) {

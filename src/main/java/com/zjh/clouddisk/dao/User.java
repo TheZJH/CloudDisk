@@ -1,6 +1,7 @@
 package com.zjh.clouddisk.dao;
 
 import java.io.Serializable;
+import java.util.Date;
 import lombok.Data;
 
 /**
@@ -8,11 +9,21 @@ import lombok.Data;
  * @author 
  */
 @Data
-public class User implements Serializable {
+public class User{
     /**
-     * 编号
+     * 用户ID
      */
     private Integer userId;
+
+    /**
+     * 用户的openid
+     */
+    private String openId;
+
+    /**
+     * 文件仓库ID
+     */
+    private Integer bucketId;
 
     /**
      * 用户名
@@ -20,39 +31,28 @@ public class User implements Serializable {
     private String username;
 
     /**
+     * 用户邮箱
+     */
+    private String email;
+
+    /**
      * 密码
      */
     private String password;
 
     /**
-     * 真实姓名
+     * 注册时间
      */
-    private String realname;
+    private Date registerTime;
 
     /**
-     * 手机号
+     * 头像地址
      */
-    private String phone;
+    private String imagePath;
 
     /**
-     * 邮箱
+     * 用户角色,0管理员，1普通用户
      */
-    private String mall;
+    private Integer role;
 
-    /**
-     * 状态
-     */
-    private Integer state;
-
-    /**
-     * 职位
-     */
-    private String postion;
-
-    /**
-     * 创建时间
-     */
-    private String created;
-
-    private static final long serialVersionUID = 1L;
 }

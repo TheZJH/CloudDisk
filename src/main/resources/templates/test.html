@@ -1,11 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>测试</title>
+    <title>test</title>
 </head>
 <body>
-成功
+<table>
+    <tr>
+        <td>
+            编号
+        </td>
+    </tr>
+    <tr th:each="file,state:${fileList}">
+        <td>
+            <span th:text="${file.fileName}"></span>
+        </td>
+    </tr>
+    <tr th:each="folder,state:${folderList}">
+        <td>
+            <span th:text="${folder.folderName}"></span>
+        </td>
+    </tr>
+</table>
 </body>
 </html>
