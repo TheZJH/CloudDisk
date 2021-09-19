@@ -23,6 +23,7 @@ public class LoginController {
 
     /**
      * 跳转到登陆界面
+     *
      * @return
      */
     @GetMapping("/login")
@@ -32,6 +33,7 @@ public class LoginController {
 
     /**
      * 登录界面表单验证
+     *
      * @param username
      * @param password
      * @param session
@@ -42,10 +44,10 @@ public class LoginController {
                         @RequestParam("password") String password,
                         HttpSession session) {
         //根据用户名密码查询
-        User login = userService.login(username,password);
+        User login = userService.login(username, password);
         if (username.isEmpty() || password.isEmpty()) {
             session.setAttribute("msg", "用户名或密码不能为空");
-            return "loginController";
+            return "auth-sign-in";
         }
         if (login != null) {
             //保存用户信息
@@ -60,7 +62,7 @@ public class LoginController {
             if (role.equals(0)) {
                 return "redirect:/index";
             } else {
-                return "redirect:/error";
+                return "redirect:/page-error";
             }
         } else {
             session.setAttribute("msg", "用户名或密码错误");
@@ -74,5 +76,13 @@ public class LoginController {
         return "index";
     }
 
+    /**
+     * 去注册页面
+     * @return
+     */
+    @GetMapping("/register")
+    public String toRegisterPage(){
+        return "auth-sign-in";
+    }
 
 }

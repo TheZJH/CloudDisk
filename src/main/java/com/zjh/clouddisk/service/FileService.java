@@ -14,4 +14,6 @@ public interface FileService {
     List<CloudFile> findAllFiles(Integer bucketId,Integer folderId);
 
     CloudFile getFileByFileId(Integer fileId, Integer bucketId);
+
+    int addFile(CloudFile file);
 }

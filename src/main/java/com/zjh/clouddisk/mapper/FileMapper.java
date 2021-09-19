@@ -1,10 +1,7 @@
 package com.zjh.clouddisk.mapper;
 
 import com.zjh.clouddisk.dao.CloudFile;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.ResultMap;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -57,4 +54,7 @@ public interface FileMapper {
     @Select("select * from file where file_id=#{fileId} and bucket_id=#{bucketId}")
     @ResultMap("fileMap")
     CloudFile getFileByFileId(Integer fileId, Integer bucketId);
+
+    @Insert("insert into file(file_author,created_time,file_size,file_name,file_path,parent_folder_id,bucket_id) values(#{fileAuthor},#{createdTime},#{fileSize},#{fileName},#{filePath},#{parentFolderId},#{bucketId})")
+    int addFile(CloudFile file);
 }

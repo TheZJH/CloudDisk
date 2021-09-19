@@ -31,4 +31,9 @@ public class FileServiceImpl implements FileService {
     public CloudFile getFileByFileId(Integer fileId, Integer bucketId) {
         return fileMapper.getFileByFileId(fileId, bucketId);
     }
+
+    @Override
+    public int addFile(CloudFile file) {
+        return fileMapper.addFile(file);
+    }
 }

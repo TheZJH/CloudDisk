@@ -8,14 +8,13 @@ import com.zjh.clouddisk.dao.User;
 import com.zjh.clouddisk.service.FolderService;
 import com.zjh.clouddisk.service.FileService;
 import com.zjh.clouddisk.util.CloudConfig;
+import com.zjh.clouddisk.util.GetSize;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.util.StringUtils;
 import sun.nio.ch.IOUtil;
 
@@ -23,9 +22,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,7 +50,8 @@ public class FileController {
 
     /**
      * 全部文件展示
-     *接受RestFul风格参数
+     * 接受RestFul风格参数
+     *
      * @param folderId
      * @param model
      * @param session
@@ -61,7 +64,7 @@ public class FileController {
         List<CloudFile> fileList = null;
         List<Folder> folderList = null;
         //说明是根目录
-        if (folderId == null||folderId==0) {
+        if (folderId == null || folderId == 0) {
             folderList = folderService.findAllRootFolder(1);
             fileList = fileService.findAllRootFile(1);
         } else {
@@ -120,6 +123,42 @@ public class FileController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return "success";
+    }
+
+    /**
+     * 上传文件页面
+     *
+     * @return
+     */
+    @PostMapping("/file/update")
+    @ResponseBody
+    public String toUpdatePage(Integer folderId, @RequestParam("file") MultipartFile multipartFile) throws IOException {
+        Date d = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss ");
+        InputStream inputStream = multipartFile.getInputStream();
+        String objectKey = "";
+        if (folderId == null || folderId == 0) {
+            //当前目录为根目录
+            objectKey = multipartFile.getOriginalFilename();
+            fileService.addFile(CloudFile.builder().
+                    fileName(objectKey)
+                    .bucketId(1)
+                    .fileSize(GetSize.getSize(multipartFile.getSize()))
+                    .createdTime(null).build());
+        } else {
+            String prefix=folderService.findFolderPath(1,folderId);
+            fileService.addFile(CloudFile.builder().
+                    fileName(objectKey)
+                    .bucketId(1)
+                    .fileSize(GetSize.getSize(multipartFile.getSize()))
+                    .parentFolderId(folderId)
+                    .createdTime(null).build());
+        }
+        objectKey="2/"+multipartFile.getOriginalFilename();
+        obsClient.putObject("xpu", objectKey, inputStream);
+        inputStream.close();
+        obsClient.close();
         return "success";
     }
 }

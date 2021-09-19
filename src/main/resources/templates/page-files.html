@@ -23,6 +23,11 @@
                 <div class="col-lg-12">
                     <div class="d-flex align-items-center justify-content-between welcome-content mb-3">
                         <h4>全部文件</h4>
+                        <div><form th:action="@{/file/update(${param.folderId})}" method="post" enctype="multipart/form-data">
+                            <input type="file" name="file"/>
+                            <span th:text="${param.folderId}"></span>
+                            <input name="submit" value="upload" type="submit"/>
+                        </form></div>
                         <div class="d-flex align-items-center">
                             <div class="list-grid-toggle mr-4">
                                 <span class="icon icon-grid i-grid"><i
@@ -106,6 +111,7 @@
                                         </tr>
                                         </thead>
                                         <tbody>
+
                                         <tr th:each="folder,state:${folderList}">
                                             <td>
                                                 <div class="d-flex align-items-center">

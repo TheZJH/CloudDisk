@@ -10,4 +10,5 @@ import java.util.List;
 public interface FolderService {
     List<Folder> findAllRootFolder(Integer bucketId);
     List<Folder> findFolder(Integer bucketId,Integer folderId);
+    String findFolderPath(Integer bucketId, Integer folderId);
 }
