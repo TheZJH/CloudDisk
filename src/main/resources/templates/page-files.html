@@ -21,34 +21,13 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
+                    <a th:each="folder:${pathList}">
+                        <a th:text="${folder.folderName}+'>'" th:href="@{/file(folderId=${folder.folderId})}"></a>
+                    </a>
                     <div class="d-flex align-items-center justify-content-between welcome-content mb-3">
                         <h4>全部文件</h4>
-                        <div class="new-create select-dropdown input-prepend input-append">
-                            <div class="btn-group">
-                                <label data-toggle="dropdown">
-                                    <div class="search-query selet-caption"><i class="las la-plus pr-2"></i>Create New</div>
-                                    <span class="search-replace"></span>
-                                    <span class="caret"><!--icon--></span>
-                                </label>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <div class="item"><i class="ri-folder-add-line pr-3"></i>
-                                            <form th:action="@{/file/upload(folderId=${param.folderId})}" method="post" enctype="multipart/form-data">
-                                                <input type="file" name="file"/>
-                                                <input name="submit" value="upload" type="submit"/>
-                                            </form>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="item"><i class="ri-file-upload-line pr-3"></i>上传文件</div>
-                                    </li>
-                                    <li>
-                                        <div class="item"><i class="ri-folder-upload-line pr-3"></i>上传文件夹</div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center">
+
+                        <!--<div class="d-flex align-items-center">
                             <div class="list-grid-toggle mr-4">
                                 <span class="icon icon-grid i-grid"><i
                                         class="ri-layout-grid-line font-size-20"></i></span>
@@ -76,13 +55,51 @@
                                     </ul>
                                 </div>
                             </div>
+                        </div>-->
+                        <div class="new-create select-dropdown input-prepend input-append">
+                            <div class="btn-group">
+                                <label data-toggle="dropdown">
+                                    <div class="search-query selet-caption"><i class="las la-plus pr-2"></i>Create New
+                                    </div>
+                                    <span class="search-replace"></span>
+                                    <span class="caret"><!--icon--></span>
+                                </label>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <div class="item">
+                                            <span>上传文件</span>
+                                            <i class="ri-folder-add-line pr-3"></i>
+                                            <form th:action="@{/file/upload(folderId=${param.folderId})}" method="post"
+                                                  enctype="multipart/form-data">
+                                                <input type="file" name="file"/>
+                                                <input name="submit" value="上传" type="submit"/>
+                                            </form>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item">
+                                            <span>新建文件夹</span>
+                                            <i class="ri-file-upload-line pr-3"></i>
+                                            <form th:action="@{/addFolder(folderId=${param.folderId})}" method="post">
+                                                <input type="text" name="folderName" placeholder="请输入文件夹名"/>
+                                                <input name="submit" value="提交" type="submit"/>
+                                            </form>
+                                        </div>
+
+                                    </li>
+                                    <li>
+                                        <div class="item"><i class="ri-folder-upload-line pr-3"></i>上传文件夹</div>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="icon icon-grid i-grid">
+
+            <div class="icon icon-grid i-list">
                 <div class="row">
-                    <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div th:each="folder,state:${folderList}" class="col-lg-3 col-md-6 col-sm-6">
                         <div class="card card-block card-stretch card-height">
                             <div class="card-body image-thumb">
                                 <div class="mb-4 text-center p-3 rounded iq-thumb">
@@ -93,12 +110,13 @@
                                        data-target="#exampleModal"><img src="assets/images/layouts/page-7/pdf.png"
                                                                         class="img-fluid" alt="image1"></a>
                                 </div>
-                                <h6>Spike.pdf</h6>
+                                <h6 th:text="${folder.folderName}"></h6>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6">
-                        <div class="card card-block card-stretch card-height">
+
+                    <div class="col-lg-3 col-md-6 col-sm-6" th:each="cloudfile,state:${fileList}">
+                        <div class=" card card-block card-stretch card-height">
                             <div class="card-body image-thumb">
                                 <div class="mb-4 text-center p-3 rounded iq-thumb">
                                     <div class="iq-image-overlay"></div>
@@ -108,13 +126,13 @@
                                        data-target="#exampleModal"><img src="assets/images/layouts/page-7/doc.png"
                                                                         class="img-fluid" alt="image1"></a>
                                 </div>
-                                <h6>Support.docx</h6>
+                                <h6 th:text="${cloudfile.fileName}"></h6>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="icon icon-grid i-list">
+            <div class="icon icon-grid i-grid">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card card-block card-stretch card-height">
@@ -160,7 +178,8 @@
                                                          aria-labelledby="dropdownMenuButton10">
                                                         <a class="dropdown-item" href="#"><i
                                                                 class="ri-eye-fill mr-2"></i>View</a>
-                                                        <a class="dropdown-item" th:href="@{/file/delete(floderId=${folder.folderId})}"><i
+                                                        <a class="dropdown-item"
+                                                           th:href="@{/file/delete(floderId=${folder.folderId})}"><i
                                                                 class="ri-delete-bin-6-fill mr-2"></i>删除</a>
                                                         <a class="dropdown-item" href="#"><i
                                                                 class="ri-pencil-fill mr-2"></i>编辑</a>
@@ -199,13 +218,15 @@
                                                          aria-labelledby="dropdownMenuButton10">
                                                         <a class="dropdown-item" href="#"><i
                                                                 class="ri-eye-fill mr-2"></i>View</a>
-                                                        <a class="dropdown-item" th:href="@{file/delete/(folderId=${folderId},fileId=${cloudfile.fileId})}"><i
+                                                        <a class="dropdown-item"
+                                                           th:href="@{file/delete/(folderId=${folderId},fileId=${cloudfile.fileId})}"><i
                                                                 class="ri-delete-bin-6-fill mr-2"></i>删除</a>
                                                         <a class="dropdown-item" href="#"><i
                                                                 class="ri-pencil-fill mr-2"></i>编辑</a>
                                                         <a class="dropdown-item" href="#"><i
                                                                 class="ri-printer-fill mr-2"></i>Print</a>
-                                                        <a class="dropdown-item" th:href="@{file/download/(folderId=${folderId},fileId=${cloudfile.fileId})}"><i
+                                                        <a class="dropdown-item"
+                                                           th:href="@{file/download/(folderId=${folderId},fileId=${cloudfile.fileId})}"><i
                                                                 class="ri-file-download-fill mr-2"></i>下载</a>
                                                     </div>
                                                 </div>

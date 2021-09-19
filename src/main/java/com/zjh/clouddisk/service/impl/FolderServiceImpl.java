@@ -31,4 +31,14 @@ public class FolderServiceImpl implements FolderService {
     public String findFolderPath(Integer bucketId, Integer folderId) {
         return folderMapper.findFolderPath(bucketId, folderId);
     }
+
+    @Override
+    public Folder findParentFolderId(Integer bucketId, Integer parentFolderId) {
+        return folderMapper.findParentFolderId(bucketId, parentFolderId);
+    }
+
+    @Override
+    public int addFolder(Folder folder) {
+        return folderMapper.addFolder(folder);
+    }
 }

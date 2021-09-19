@@ -12,6 +12,7 @@ import lombok.Data;
  * @author
  */
 @Data
+@Builder
 public class Folder {
     private Integer folderId;
 
@@ -24,4 +25,16 @@ public class Folder {
     private Date time;
 
     private String folderPath;
+
+    public Folder() {
+    }
+
+    public Folder(Integer folderId, String folderName, Integer parentFolderId, Integer bucketId, Date time, String folderPath) {
+        this.folderId = folderId;
+        this.folderName = folderName;
+        this.parentFolderId = parentFolderId;
+        this.bucketId = bucketId;
+        this.time = time;
+        this.folderPath = folderPath;
+    }
 }

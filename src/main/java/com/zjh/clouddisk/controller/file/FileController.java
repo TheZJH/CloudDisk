@@ -21,10 +21,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +42,7 @@ public class FileController {
 
     @Autowired
     private FolderService folderService;
+
 
     /**
      * 创建ObsClient实例
@@ -61,19 +64,46 @@ public class FileController {
         User user = (User) session.getAttribute("loginUser");
         List<CloudFile> fileList = null;
         List<Folder> folderList = null;
+        List<Folder> pathList = new ArrayList<>();
         //说明是根目录
         if (folderId == null || folderId == 0) {
+            folderId = 0;
             folderList = folderService.findAllRootFolder(1);
             fileList = fileService.findAllRootFile(1);
+            Folder newFolder = Folder.builder().folderId(folderId).folderName("全部文件").build();
+            pathList.add(newFolder);
         } else {
             //说明不是根目录,folderId就是子文件和文件夹的parentId
             folderList = folderService.findFolder(1, folderId);
             fileList = fileService.findAllFiles(1, folderId);
+            Folder newFolder = folderService.findParentFolderId(1, folderId);
+            Folder newFolder1 = Folder.builder().folderId(0).folderName("全部文件").build();
+            pathList.add(newFolder1);
+            Folder temp = newFolder;
+            pathList.add(temp);
+            while (temp.getParentFolderId() != 0) {
+                temp = folderService.findParentFolderId(1, temp.getParentFolderId());
+                pathList.add(temp);
+            }
         }
         model.addAttribute("folderList", folderList);
         model.addAttribute("fileList", fileList);
         model.addAttribute("folderId", folderId);
+        //文件路径
+        model.addAttribute("pathList", pathList);
         return "page-files";
+    }
+
+    /**
+     * 更新文件
+     * @param fileId
+     * @param folderId
+     * @return
+     */
+    @GetMapping("/file/update")
+    public String updateFile(String fileId,Integer folderId) {
+
+        return "redirect:/file?folderId=" + folderId;
     }
 
     /**
@@ -128,19 +158,19 @@ public class FileController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "success";
+        return "redirect:/file?folderId=" + folderId;
     }
 
     /**
      * 上传文件页面
+     * 忘了取消ResponseBody注解
      *
      * @return
      */
     @PostMapping("/file/upload")
-    @ResponseBody
     public String toUpdatePage(Integer folderId, @RequestParam("file") MultipartFile multipartFile) throws IOException {
-        Date d = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss ");
+        //获取当前时间
+        Date date = new Date();
         InputStream inputStream = multipartFile.getInputStream();
         String objectKey = "";
         if (folderId == null || folderId == 0) {
@@ -149,22 +179,23 @@ public class FileController {
             fileService.addFile(CloudFile.builder().
                     fileName(objectKey)
                     .bucketId(1)
+                    .parentFolderId(folderId)
                     .fileSize(GetSize.getSize(multipartFile.getSize()))
-                    .createdTime(null).build());
+                    .createdTime(date).build());
         } else {
             String prefix = folderService.findFolderPath(1, folderId);
-            objectKey = "2/" + multipartFile.getOriginalFilename();
+            objectKey = prefix + multipartFile.getOriginalFilename();
             fileService.addFile(CloudFile.builder().
                     fileName(objectKey)
                     .bucketId(1)
                     .fileSize(GetSize.getSize(multipartFile.getSize()))
                     .parentFolderId(folderId)
-                    .createdTime(null).build());
+                    .createdTime(date).build());
         }
         obsClient.putObject("xpu", objectKey, inputStream);
         inputStream.close();
         obsClient.close();
-        return "success";
+        return "redirect:/file?folderId=" + folderId;
     }
 
     /**
@@ -175,7 +206,6 @@ public class FileController {
      * @return
      */
     @GetMapping("file/delete")
-    @ResponseBody
     public String toDeletePage(Integer folderId, Integer fileId) {
         if (folderId == 0 || folderId == null) {
             //当前目录为根目录
@@ -193,6 +223,48 @@ public class FileController {
             fileService.deleteFile(fileId);
             obsClient.deleteObject("xpu", objectKey);
         }
-        return "success";
+        return "redirect:/file?folderId=" + folderId;
     }
+
+    /**
+     * 新建文件夹
+     *
+     * @param folderName
+     * @param folderId
+     * @return
+     */
+    @PostMapping("/addFolder")
+    public String addFolder(String folderName, Integer folderId) {
+        Date date = new Date();
+        if (folderId == 0) {
+            //向根目录添加文件夹
+            folderService.addFolder(Folder.builder()
+                    .folderName(folderName)
+                    .parentFolderId(folderId)
+                    .bucketId(1)
+                    .time(date)
+                    .folderPath(folderName + "/").build());
+            //在OBS下创建文件夹
+            String objectKey = folderName + "/";
+            obsClient.putObject("xpu", objectKey, new ByteArrayInputStream(new byte[0]));
+        } else {
+            //在其他目录下添加文件夹
+            String folderPath = folderService.findFolderPath(1, folderId);
+            folderService.addFolder(Folder.builder()
+                    .folderName(folderName)
+                    .parentFolderId(folderId)
+                    .bucketId(1)
+                    .time(date)
+                    .folderPath(folderPath + folderName + "/").build());
+            String objectKey = folderPath + folderName + "/";
+            obsClient.putObject("xpu", objectKey, new ByteArrayInputStream(new byte[0]));
+        }
+        return "redirect:/file?folderId=" + folderId;
+    }
+
+    @GetMapping("/deleteFolder")
+    public String deleteFolder(Integer folderId) {
+        return "";
+    }
+
 }

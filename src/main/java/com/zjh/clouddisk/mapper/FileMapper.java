@@ -16,7 +16,7 @@ public interface FileMapper {
      * @param bucketId
      * @return
      */
-    @Select("select * from file where parent_folder_id is null and bucket_id=#{bucketId}")
+    @Select("select * from file where parent_folder_id=0 and bucket_id=#{bucketId}")
     @Results(id = "fileMap", value = {
             @Result(id = true, column = "file_id", property = "fileId"),
             @Result(column = "file_type", property = "fileType"),

@@ -1,10 +1,7 @@
 package com.zjh.clouddisk.mapper;
 
 import com.zjh.clouddisk.dao.Folder;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.ResultMap;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -19,7 +16,7 @@ public interface FolderMapper {
      * @param bucketId
      * @return
      */
-    @Select("select * from folder where parent_folder_id is null and bucket_id=#{bucketId}")
+    @Select("select * from folder where parent_folder_id=0 and bucket_id=#{bucketId}")
     @Results(id = "folderMap", value = {
             @Result(id = true, column = "folder_id", property = "folderId"),
             @Result(column = "folder_name", property = "folderName"),
@@ -43,10 +40,30 @@ public interface FolderMapper {
 
     /**
      * 查询文件夹路径
+     *
      * @param bucketId
      * @param folderId
      * @return
      */
     @Select("select folder_path from folder where bucket_id=#{bucketId} and folder_id=#{folderId}")
     String findFolderPath(Integer bucketId, Integer folderId);
+
+    /**
+     * 查询文件夹父文件夹Id=父文件夹Id的文件夹
+     *
+     * @param bucketId
+     * @param parentFolderId
+     * @return
+     */
+    @Select("select * from folder where bucket_id=#{bucketId} and folder_id=#{parentFolderId}")
+    @ResultMap("folderMap")
+    Folder findParentFolderId(Integer bucketId, Integer parentFolderId);
+
+    /**
+     * 添加文件夹
+     * @param folder
+     * @return
+     */
+    @Insert("insert into folder(folder_name,parent_folder_id,bucket_id,time,folder_path)values(#{folderName},#{parentFolderId},#{bucketId},#{time},#{folderPath})")
+    int addFolder(Folder folder);
 }
