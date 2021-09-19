@@ -43,7 +43,7 @@ public interface FileMapper {
      * @param folderId
      * @return
      */
-    @Select("select * from file parent_folder_id =#{folderId} and bucket_id=#{bucketId}")
+    @Select("select * from file where parent_folder_id=#{folderId} and bucket_id=#{bucketId}")
     @ResultMap("fileMap")
     List<CloudFile> findAllFiles(Integer bucketId, Integer folderId);
 
@@ -54,7 +54,7 @@ public interface FileMapper {
      * @param bucketId
      * @return
      */
-    @Select("select * from file file_id=#{fileId} and bucket_id=#{bucketId}")
+    @Select("select * from file where file_id=#{fileId} and bucket_id=#{bucketId}")
     @ResultMap("fileMap")
     CloudFile getFileByFileId(Integer fileId, Integer bucketId);
 }

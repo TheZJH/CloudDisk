@@ -17,7 +17,7 @@ import com.zjh.clouddisk.service.UserService;
  * @version 1.0
  */
 @Controller
-public class Login {
+public class LoginController {
     @Resource
     private UserService userService;
 
@@ -45,7 +45,7 @@ public class Login {
         User login = userService.login(username,password);
         if (username.isEmpty() || password.isEmpty()) {
             session.setAttribute("msg", "用户名或密码不能为空");
-            return "login";
+            return "loginController";
         }
         if (login != null) {
             //保存用户信息
@@ -73,4 +73,6 @@ public class Login {
     public String index() {
         return "index";
     }
+
+
 }

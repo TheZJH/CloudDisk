@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.thymeleaf.util.StringUtils;
 import sun.nio.ch.IOUtil;
 
@@ -46,19 +48,20 @@ public class FileController {
 
     /**
      * 全部文件展示
-     *
+     *接受RestFul风格参数
      * @param folderId
      * @param model
      * @param session
      * @return
      */
+
     @GetMapping("/file")
     public String toFilePage(Integer folderId, Model model, HttpSession session) {
         User user = (User) session.getAttribute("loginUser");
         List<CloudFile> fileList = null;
         List<Folder> folderList = null;
         //说明是根目录
-        if (folderId == null) {
+        if (folderId == null||folderId==0) {
             folderList = folderService.findAllRootFolder(1);
             fileList = fileService.findAllRootFile(1);
         } else {
@@ -69,9 +72,17 @@ public class FileController {
         model.addAttribute("folderList", folderList);
         model.addAttribute("fileList", fileList);
         model.addAttribute("folderId", folderId);
-        return "test";
+        return "page-files";
     }
 
+    /**
+     * 下载文件
+     *
+     * @param fileId
+     * @param response
+     * @param request
+     * @return
+     */
     @GetMapping("/download")
     public String download(Integer fileId,
                            HttpServletResponse response,
@@ -111,5 +122,4 @@ public class FileController {
         }
         return "success";
     }
-
 }

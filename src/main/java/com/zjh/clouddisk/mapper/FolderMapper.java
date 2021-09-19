@@ -34,7 +34,7 @@ public interface FolderMapper {
      * @param folderId
      * @return
      */
-    @Select("select * from folder where bucket_id=#{bucketId} and parent_folder_id =#{folderId}")
+    @Select("select * from folder where bucket_id=#{bucketId} and parent_folder_id=#{folderId}")
     @ResultMap("folderMap")
     List<Folder> findFolder(Integer bucketId,Integer folderId);
 }
