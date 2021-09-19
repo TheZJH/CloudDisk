@@ -36,4 +36,9 @@ public class FileServiceImpl implements FileService {
     public int addFile(CloudFile file) {
         return fileMapper.addFile(file);
     }
+
+    @Override
+    public int deleteFile(Integer fileId) {
+        return fileMapper.deleteFile(fileId);
+    }
 }

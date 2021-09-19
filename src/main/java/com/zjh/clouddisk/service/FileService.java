@@ -16,4 +16,6 @@ public interface FileService {
     CloudFile getFileByFileId(Integer fileId, Integer bucketId);
 
     int addFile(CloudFile file);
+
+    int deleteFile(Integer fileId);
 }

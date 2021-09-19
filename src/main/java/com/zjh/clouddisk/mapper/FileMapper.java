@@ -57,4 +57,12 @@ public interface FileMapper {
 
     @Insert("insert into file(file_author,created_time,file_size,file_name,file_path,parent_folder_id,bucket_id) values(#{fileAuthor},#{createdTime},#{fileSize},#{fileName},#{filePath},#{parentFolderId},#{bucketId})")
     int addFile(CloudFile file);
+
+    /**
+     * 根据文件Id删除文件
+     * @param fileId
+     * @return
+     */
+    @Delete("delete from file where file_id=#{fileId}")
+    int deleteFile(Integer fileId);
 }

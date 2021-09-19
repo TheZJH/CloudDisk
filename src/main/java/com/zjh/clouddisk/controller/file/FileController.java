@@ -16,7 +16,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.util.StringUtils;
-import sun.nio.ch.IOUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +23,6 @@ import javax.servlet.http.HttpSession;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -86,13 +84,20 @@ public class FileController {
      * @param request
      * @return
      */
-    @GetMapping("/download")
-    public String download(Integer fileId,
+    @GetMapping("/file/download")
+    public String download(Integer fileId, Integer folderId,
                            HttpServletResponse response,
                            HttpServletRequest request) {
-        CloudFile file = fileService.getFileByFileId(fileId, 1);
-        String fileName = file.getFileName();
-
+        String fileName = "";
+        if (folderId == null || folderId == 0) {
+            CloudFile file = fileService.getFileByFileId(fileId, 1);
+            fileName = file.getFileName();
+        } else {
+            String prefix = folderService.findFolderPath(1, folderId);
+            CloudFile file = fileService.getFileByFileId(fileId, 1);
+            String name = file.getFileName();
+            fileName = prefix + name;
+        }
         ObsObject obsObject = obsClient.getObject("xpu", fileName);
 
         InputStream input = obsObject.getObjectContent();
@@ -131,7 +136,7 @@ public class FileController {
      *
      * @return
      */
-    @PostMapping("/file/update")
+    @PostMapping("/file/upload")
     @ResponseBody
     public String toUpdatePage(Integer folderId, @RequestParam("file") MultipartFile multipartFile) throws IOException {
         Date d = new Date();
@@ -147,7 +152,8 @@ public class FileController {
                     .fileSize(GetSize.getSize(multipartFile.getSize()))
                     .createdTime(null).build());
         } else {
-            String prefix=folderService.findFolderPath(1,folderId);
+            String prefix = folderService.findFolderPath(1, folderId);
+            objectKey = "2/" + multipartFile.getOriginalFilename();
             fileService.addFile(CloudFile.builder().
                     fileName(objectKey)
                     .bucketId(1)
@@ -155,10 +161,38 @@ public class FileController {
                     .parentFolderId(folderId)
                     .createdTime(null).build());
         }
-        objectKey="2/"+multipartFile.getOriginalFilename();
         obsClient.putObject("xpu", objectKey, inputStream);
         inputStream.close();
         obsClient.close();
+        return "success";
+    }
+
+    /**
+     * 删除文件
+     *
+     * @param folderId
+     * @param fileId
+     * @return
+     */
+    @GetMapping("file/delete")
+    @ResponseBody
+    public String toDeletePage(Integer folderId, Integer fileId) {
+        if (folderId == 0 || folderId == null) {
+            //当前目录为根目录
+            CloudFile file = fileService.getFileByFileId(fileId, 1);
+            String fileName = file.getFileName();
+            //直接删除
+            fileService.deleteFile(fileId);
+            obsClient.deleteObject("xpu", fileName);
+        } else {
+            //不是根目录
+            CloudFile file = fileService.getFileByFileId(fileId, 1);
+            String fileName = file.getFileName();
+            String prefix = folderService.findFolderPath(1, folderId);
+            String objectKey = prefix + fileName;
+            fileService.deleteFile(fileId);
+            obsClient.deleteObject("xpu", objectKey);
+        }
         return "success";
     }
 }
