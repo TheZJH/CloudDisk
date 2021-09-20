@@ -2,14 +2,18 @@ package com.zjh.clouddisk.dao;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import lombok.Builder;
 import lombok.Data;
 
 /**
  * user
- * @author 
+ *
+ * @author
  */
 @Data
-public class User{
+@Builder
+public class User {
     /**
      * 用户ID
      */
@@ -18,7 +22,7 @@ public class User{
     /**
      * 用户的openid
      */
-    private String openId;
+    private String realName;
 
     /**
      * 文件仓库ID
@@ -55,4 +59,21 @@ public class User{
      */
     private Integer role;
 
+    private Integer phone;
+
+    public User() {
+    }
+
+    public User(Integer userId, String realName, Integer bucketId, String username, String email, String password, Date registerTime, String imagePath, Integer role, Integer phone) {
+        this.userId = userId;
+        this.realName = realName;
+        this.bucketId = bucketId;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.registerTime = registerTime;
+        this.imagePath = imagePath;
+        this.role = role;
+        this.phone = phone;
+    }
 }

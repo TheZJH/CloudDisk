@@ -10,5 +10,11 @@ import java.util.List;
  * @version 1.0
  */
 public interface UserService {
-    User login(String username,String password);
+    User login(String username, String password);
+
+    int addUser(User user);
+
+    List<User> findAll();
+
+    int deleteUser(Integer userId);
 }

@@ -1,10 +1,7 @@
 package com.zjh.clouddisk.mapper;
 
 import com.zjh.clouddisk.dao.User;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.ResultMap;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -23,7 +20,7 @@ public interface UserMapper {
     @Select("select * from user where user_name=#{username} and password=#{password}")
     @Results(id = "userMap", value = {
             @Result(id = true, column = "user_id", property = "userId"),
-            @Result(column = "open_id", property = "openId"),
+            @Result(column = "real_name", property = "realName"),
             @Result(column = "bucket_id", property = "bucketId"),
             @Result(column = "user_name", property = "username"),
             @Result(column = "email", property = "email"),
@@ -31,14 +28,22 @@ public interface UserMapper {
             @Result(column = "register_time", property = "registerTime"),
             @Result(column = "image_path", property = "imagePath"),
             @Result(column = "role", property = "role"),
+            @Result(column = "phone", property = "phone")
     })
     User login(String username, String password);
 
     /**
      * 查询所有用户
+     *
      * @return
      */
     @Select("select * from user")
     @ResultMap("userMap")
     List<User> findAll();
+
+    @Insert("insert into user(real_name,bucket_id,user_name,email,password,register_time,role,phone) values(#{realName},#{bucketId},#{username},#{email},#{password},#{registerTime},#{role},#{phone})")
+    int addUser(User user);
+
+    @Delete("delete from user where user_id=#{userId}")
+    int deleteUser(Integer userId);
 }

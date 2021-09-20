@@ -3,8 +3,11 @@ package com.zjh.clouddisk.controller.file;
 import com.obs.services.ObsClient;
 import com.obs.services.exception.ObsException;
 import com.obs.services.model.HeaderResponse;
+import com.obs.services.model.ListBucketsRequest;
+import com.obs.services.model.ObsBucket;
 import com.zjh.clouddisk.util.CloudConfig;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -57,5 +60,15 @@ public class BucketController {
         //删除桶
         obsClient.deleteBucket("bucketName");
         return "test";
+    }
+
+    @GetMapping("/bucket/list")
+    public String bucketList(Model model) {
+        ListBucketsRequest request = new ListBucketsRequest();
+        request.setQueryLocation(true);
+        List<ObsBucket> bucketList = obsClient.listBuckets(request);
+        //BucketName,CreationDate,Location
+        model.addAttribute("bucketList", bucketList);
+        return "bucket-list";
     }
 }

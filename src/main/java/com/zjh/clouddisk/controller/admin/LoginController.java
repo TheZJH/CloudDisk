@@ -78,11 +78,12 @@ public class LoginController {
 
     /**
      * 去注册页面
+     *
      * @return
      */
     @GetMapping("/register")
-    public String toRegisterPage(){
-        return "auth-sign-in";
+    public String toRegisterPage() {
+        return "auth-sign-up";
     }
 
 }

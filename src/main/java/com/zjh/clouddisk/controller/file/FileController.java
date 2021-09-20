@@ -242,10 +242,10 @@ public class FileController {
      * @return
      */
     @PostMapping("/folder/update")
-    public String addFolder(Integer folderId,String folderName) {
+    public String addFolder(Integer folderId, String folderName) {
         Date date = new Date();
         String objectKey;
-        if (folderId == 0||folderId==null) {
+        if (folderId == 0 || folderId == null) {
             //向根目录添加文件夹
             folderService.addFolder(Folder.builder()
                     .folderName(folderName)
