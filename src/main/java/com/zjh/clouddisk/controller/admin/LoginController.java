@@ -1,8 +1,21 @@
 package com.zjh.clouddisk.controller.admin;
 
 
+import com.obs.services.ObsClient;
+import com.obs.services.model.BucketQuota;
+import com.obs.services.model.BucketStorageInfo;
+import com.zjh.clouddisk.dao.BucketVO;
+import com.zjh.clouddisk.dao.CloudFile;
+import com.zjh.clouddisk.dao.Folder;
 import com.zjh.clouddisk.dao.User;
+import com.zjh.clouddisk.mapper.BucketMapper;
+import com.zjh.clouddisk.mapper.FileMapper;
+import com.zjh.clouddisk.mapper.FolderMapper;
+import com.zjh.clouddisk.util.CloudConfig;
+import com.zjh.clouddisk.util.GetSize;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,14 +25,27 @@ import javax.servlet.http.HttpSession;
 
 import com.zjh.clouddisk.service.UserService;
 
+import java.util.List;
+
 /**
  * @author TheZJH
  * @version 1.0
  */
 @Controller
 public class LoginController {
-    @Resource
+    @Autowired
     private UserService userService;
+
+    @Resource
+    private BucketMapper bucketMapper;
+
+    @Resource
+    private FileMapper fileMapper;
+
+    @Resource
+    private FolderMapper folderMapper;
+
+    final ObsClient obsClient = new ObsClient(CloudConfig.ak, CloudConfig.sk, CloudConfig.endPoint);
 
     /**
      * 跳转到登陆界面
@@ -53,10 +79,11 @@ public class LoginController {
             //保存用户信息
             session.setAttribute("loginUser", login);
             session.setAttribute("msg", null);
-            //重定向防止表单重复提交
+
             Integer role = login.getRole();
             //判断是否是管理员
             if (role.equals(1)) {
+                //重定向防止表单重复提交
                 return "redirect:/index";
             }
             if (role.equals(0)) {
@@ -72,7 +99,23 @@ public class LoginController {
 
 
     @GetMapping("/index")
-    public String index() {
+    public String index(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loginUser");
+        Integer bucketId = user.getBucketId();
+        String bucketName = bucketMapper.findBucketName(bucketId);
+        BucketStorageInfo storageInfo = obsClient.getBucketStorageInfo(bucketName);
+        BucketQuota quota = obsClient.getBucketQuota(bucketName);
+
+        session.setAttribute("bucket", BucketVO.builder()
+                .bucketId(bucketId)
+                .bucketName(bucketName)
+                .bucketObjectNumber(storageInfo.getObjectNumber())
+                .bucketSize(GetSize.getSize(storageInfo.getSize()))
+                .bucketQuota(quota).build());
+        List<CloudFile> files = fileMapper.indexFile();
+        List<Folder> folders = folderMapper.indexFolder();
+        model.addAttribute("indexFile", files);
+        model.addAttribute("indexFolder",folders);
         return "index";
     }
 

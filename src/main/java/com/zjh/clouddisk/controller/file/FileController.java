@@ -1,9 +1,9 @@
 package com.zjh.clouddisk.controller.file;
 
 import com.obs.services.ObsClient;
-import com.obs.services.internal.DefaultProgressStatus;
 import com.obs.services.model.*;
 import com.obs.services.model.fs.RenameRequest;
+import com.obs.services.model.fs.RenameResult;
 import com.zjh.clouddisk.dao.Folder;
 import com.zjh.clouddisk.dao.CloudFile;
 import com.zjh.clouddisk.dao.User;
@@ -265,13 +265,18 @@ public class FileController {
         CloudFile file = fileService.getFileByFileId(fileId, 1);
         if (folderId == 0) {
             //如果是根目录
-            SetObjectMetadataRequest request = new SetObjectMetadataRequest("xpu", file.getFileName());
+            RenameRequest request = new RenameRequest();
+            //桶名
+            request.setBucketName("xpu");
+            //原对象完整文件名
+            request.setObjectKey(file.getFileName());
+            //目标对象名
+            request.setNewObjectKey(fileName);
             //更新OBS文件名
-            request.setObjectKey(fileName);
+            RenameResult result = obsClient.renameFile(request);
             //更新数据库文件名
             fileService.updateFileName(fileId, fileName, 1);
-            request.setObjectKey(fileName);
-            obsClient.setObjectMetadata(request);
+
             obsClient.close();
         } else {
             //不是根目录

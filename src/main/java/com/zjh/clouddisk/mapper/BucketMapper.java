@@ -8,5 +8,8 @@ import org.apache.ibatis.annotations.Select;
  */
 public interface BucketMapper {
     @Select("select bucket_id from bucket where bucket_name=#{bucketName}")
-    public Integer bucketId(String bucketName);
+    Integer bucketId(String bucketName);
+
+    @Select("select bucket_name from bucket where bucket_id=#{bucketId}")
+    String findBucketName(Integer bucketId);
 }

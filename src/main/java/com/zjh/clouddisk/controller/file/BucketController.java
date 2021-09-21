@@ -9,6 +9,7 @@ import com.zjh.clouddisk.util.CloudConfig;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
@@ -26,9 +27,8 @@ public class BucketController {
      */
     final ObsClient obsClient = new ObsClient(CloudConfig.ak, CloudConfig.sk, CloudConfig.endPoint);
 
-    @GetMapping("/bucket/upload")
-    @ResponseBody
-    public String uploadBucket(String bucketName, Map<String, Object> map) {
+    @PostMapping ("/bucket/upload")
+    public String uploadBucket(String bucketName, Map<String, Object> map, Model model) {
         /**
          * ● 桶的名字是全局唯一的，所以您需要确保不与已有的桶名称重复。
          * ● 桶命名规则如下：
@@ -38,12 +38,11 @@ public class BucketController {
          * ● 禁止两个“.”相邻（如：“my..bucket”）。
          * ● 禁止“.”和“-”相邻（如：“my-.bucket”和“my.-bucket”）。
          */
-        boolean exists = obsClient.headBucket("bucketname");
+        boolean exists = obsClient.headBucket(bucketName);
         try {
             //创建桶成功
             HeaderResponse response = obsClient.createBucket(bucketName);
             String requestId = response.getRequestId();
-            return "requestId";
         } catch (ObsException e) {
             //创建桶失败
             map.put("HTTP Code: ", e.getResponseCode());
@@ -51,8 +50,16 @@ public class BucketController {
             map.put("Error Message", e.getErrorMessage());
             map.put("Request ID", e.getErrorRequestId());
             map.put("Host ID", e.getErrorHostId());
-            return "map";
+            model.addAttribute("obsException", e);
+
         }
+        return "bucket-add";
+    }
+
+    @GetMapping("/bucket/add")
+    public String toAddBucketPage() {
+
+        return "bucket-add";
     }
 
     @GetMapping("/bucket/delete")

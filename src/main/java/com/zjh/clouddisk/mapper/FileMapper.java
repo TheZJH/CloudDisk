@@ -27,7 +27,7 @@ public interface FileMapper {
             @Result(column = "file_name", property = "fileName"),
             @Result(column = "file_path", property = "filePath"),
             @Result(column = "postfix", property = "postfix"),
-            @Result(column = "file_tag", property = "fileTag"),
+            @Result(column = "objectKey", property = "objectKey"),
             @Result(column = "parent_folder_id", property = "parentFolderId"),
             @Result(column = "bucket_id", property = "bucketId"),
     })
@@ -69,4 +69,8 @@ public interface FileMapper {
 
     @Update("update file set file_name =#{fileName} where file_id=#{fileId} and bucket_id=#{bucketId}")
     int updateFileName(Integer fileId, String fileName, Integer bucketId);
+
+    @Select("SELECT *FROM FILE  ORDER BY created_time DESC LIMIT 0,5")
+    @ResultMap("fileMap")
+    List<CloudFile> indexFile();
 }

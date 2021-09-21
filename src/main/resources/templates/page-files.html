@@ -155,16 +155,10 @@
                                         <tr th:each="folder,state:${folderList}">
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <div class="icon-small bg-danger rounded mr-3">
-                                                        <i class="ri-file-excel-line"></i>
-                                                    </div>
-                                                    <div data-load-file="file" data-load-target="#resolte-contaniner"
-                                                         data-url="assets/vendor/doc-viewer/files/demo.pdf"
-                                                         data-toggle="modal" data-target="#exampleModal"
-                                                         data-title="alexa5.pdf" style="cursor: pointer;">
-                                                        <a th:href="@{/file(folderId=${folder.folderId})}"
-                                                           th:text="${folder.folderName}"></a>
-                                                    </div>
+                                                    <img th:src="@{/assets/images/layouts/mydrive/folder.png}"
+                                                    height="50" width="50" th:href="@{/file(folderId=${folder.folderId})}">
+                                                    <a th:href="@{/file(folderId=${folder.folderId})}"
+                                                       th:text="${folder.folderName}"></a>
                                                 </div>
                                             </td>
                                             <td><span></span></td>

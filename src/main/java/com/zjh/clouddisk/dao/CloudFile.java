@@ -32,13 +32,13 @@ public class CloudFile implements Serializable {
 
     private String postfix;
 
-    private String fileTag;
+    private String objectKey;
 
     private Integer parentFolderId;
 
     private Integer bucketId;
 
-    public CloudFile(Integer fileId, Integer fileType, String fileAuthor, Date createdTime, Date updateTime, String fileSize, String fileName, String filePath, String postfix, String fileTag, Integer parentFolderId, Integer bucketId) {
+    public CloudFile(Integer fileId, Integer fileType, String fileAuthor, Date createdTime, Date updateTime, String fileSize, String fileName, String filePath, String postfix, String objectKey, Integer parentFolderId, Integer bucketId) {
         this.fileId = fileId;
         this.fileType = fileType;
         this.fileAuthor = fileAuthor;
@@ -48,7 +48,7 @@ public class CloudFile implements Serializable {
         this.fileName = fileName;
         this.filePath = filePath;
         this.postfix = postfix;
-        this.fileTag = fileTag;
+        this.objectKey = objectKey;
         this.parentFolderId = parentFolderId;
         this.bucketId = bucketId;
     }

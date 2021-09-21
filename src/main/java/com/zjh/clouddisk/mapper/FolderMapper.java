@@ -81,4 +81,7 @@ public interface FolderMapper {
 
     @Delete("delete from folder where bucket_id=#{bucketId} and folder_id=#{folderId}")
     int deleteFolder(Integer bucketId, Integer folderId);
+
+    @Select("SELECT *FROM folder  ORDER BY time DESC LIMIT 0,4")
+    List<Folder> indexFolder();
 }

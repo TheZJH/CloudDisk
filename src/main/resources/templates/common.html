@@ -55,7 +55,7 @@
                 <ul id="iq-sidebar-toggle" class="iq-menu">
                     <li class=" ">
                         <a th:href="@{/index}" class="">
-                            <i class="las la-home iq-arrow-left"></i><span>Dashboard</span>
+                            <i class="las la-home iq-arrow-left"></i><span>主页</span>
                         </a>
                         <ul id="dashboard" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
                         </ul>
@@ -98,7 +98,7 @@
                     </li>
                     <li class=" ">
                         <a href="page-folders.html" class="">
-                            <i class="las la-stopwatch iq-arrow-left"></i><span>Recent</span>
+                            <i class="las la-stopwatch iq-arrow-left"></i><span>任务管理</span>
                         </a>
                         <ul id="page-folders" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
                         </ul>
@@ -112,7 +112,7 @@
                     </li>
                     <li class=" ">
                         <a href="page-delete.html" class="">
-                            <i class="las la-trash-alt iq-arrow-left"></i><span>Trash</span>
+                            <i class="las la-trash-alt iq-arrow-left"></i><span>回收站</span>
                         </a>
                         <ul id="page-delete" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
                         </ul>
@@ -177,14 +177,16 @@
                 </ul>
             </nav>
             <div class="sidebar-bottom">
-                <h4 class="mb-3"><i class="las la-cloud mr-2"></i>Storage</h4>
-                <p>17.1 / 20 GB Used</p>
+                <h4 class="mb-3" th:inline="text"><i class="las la-cloud mr-2"></i>
+                    Bucket:[[${session.bucket.getBucketName()}]]</h4>
+                <!--内敛表达式-->
+                <p th:inline="text">[[${session.bucket.bucketSize}]]/ [[${session.bucket.bucketQuota}]]</p>
                 <div class="iq-progress-bar mb-3">
                       <span class="bg-primary iq-progress progress-1" data-percent="67">
                       </span>
                 </div>
                 <p>75% Full - 3.9 GB Free</p>
-                <a href="#" class="btn btn-outline-primary view-more mt-4">Buy Storage</a>
+                <a href="#" class="btn btn-outline-primary view-more mt-4">Test</a>
             </div>
             <div class="p-3"></div>
         </div>
@@ -207,32 +209,10 @@
                             <div class="btn-group">
                                 <label class="dropdown-toggle searchbox" data-toggle="dropdown">
                                     <input class="dropdown-toggle search-query text search-input" type="text"
-                                           placeholder="搜索您的文件"><span class="search-replace"></span>
-                                    <a class="search-link" href="#"><i class="ri-search-line"></i></a>
+                                           placeholder="搜索您的文件" name="findFile"><span class="search-replace"></span>
+                                    <a class="search-link" th:href="@{/file/serach}"><i class="ri-search-line"></i></a>
                                     <span class="caret"><!--icon--></span>
                                 </label>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#">
-                                        <div class="item"><i class="far fa-file-pdf bg-info"></i>PDFs</div>
-                                    </a></li>
-                                    <li><a href="#">
-                                        <div class="item"><i class="far fa-file-alt bg-primary"></i>Documents</div>
-                                    </a></li>
-                                    <li><a href="#">
-                                        <div class="item"><i class="far fa-file-excel bg-success"></i>Spreadsheet</div>
-                                    </a></li>
-                                    <li><a href="#">
-                                        <div class="item"><i class="far fa-file-powerpoint bg-danger"></i>Presentation
-                                        </div>
-                                    </a></li>
-                                    <li><a href="#">
-                                        <div class="item"><i class="far fa-file-image bg-warning"></i>Photos & Images
-                                        </div>
-                                    </a></li>
-                                    <li><a href="#">
-                                        <div class="item"><i class="far fa-file-video bg-info"></i>Videos</div>
-                                    </a></li>
-                                </ul>
                             </div>
                         </div>
                     </form>
