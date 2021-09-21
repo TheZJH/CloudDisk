@@ -3,6 +3,10 @@ spring:
     #session过期时间
     session:
       timeout: 60m
+    #SpringBoot默认限制传输文件,改为-1为不限制
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
   datasource:
     url: jdbc:mysql://localhost:3306/clouddisk?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
