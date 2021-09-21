@@ -1,7 +1,8 @@
 package com.zjh.clouddisk.controller.file;
 
 import com.obs.services.ObsClient;
-import com.obs.services.model.ObsObject;
+import com.obs.services.internal.DefaultProgressStatus;
+import com.obs.services.model.*;
 import com.obs.services.model.fs.RenameRequest;
 import com.zjh.clouddisk.dao.Folder;
 import com.zjh.clouddisk.dao.CloudFile;
@@ -10,6 +11,7 @@ import com.zjh.clouddisk.service.FolderService;
 import com.zjh.clouddisk.service.FileService;
 import com.zjh.clouddisk.util.CloudConfig;
 import com.zjh.clouddisk.util.GetSize;
+import com.zjh.clouddisk.util.GetType;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,10 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author TheZJH
@@ -176,7 +175,7 @@ public class FileController {
      * @return
      */
     @PostMapping("/file/upload")
-    public String toUpdatePage(Integer folderId, @RequestParam("file") MultipartFile multipartFile) throws IOException {
+    public String toUpdatePage(Integer folderId, @RequestParam("file") MultipartFile multipartFile, HttpSession session) throws IOException {
         //获取当前时间
         Date date = new Date();
         InputStream inputStream = multipartFile.getInputStream();
@@ -184,22 +183,47 @@ public class FileController {
         if (folderId == null || folderId == 0) {
             //当前目录为根目录
             objectKey = multipartFile.getOriginalFilename();
+            //最后一个点出现的位置
+            int index = objectKey.lastIndexOf(".");
+            //获取文件后缀名
+            String postfix = objectKey.substring(index, objectKey.length());
+            int type = GetType.getType(postfix);
             fileService.addFile(CloudFile.builder().
                     fileName(objectKey)
                     .bucketId(1)
                     .parentFolderId(folderId)
                     .fileSize(GetSize.getSize(multipartFile.getSize()))
+                    .postfix(postfix)
+                    .fileType(type)
                     .createdTime(date).build());
         } else {
             String prefix = folderService.findFolderPath(1, folderId);
             objectKey = prefix + multipartFile.getOriginalFilename();
+            int index = objectKey.lastIndexOf(".");
+            //获取文件后缀名
+            String postfix = objectKey.substring(index, objectKey.length());
+            int type = GetType.getType(postfix);
             fileService.addFile(CloudFile.builder().
                     fileName(multipartFile.getOriginalFilename())
                     .bucketId(1)
                     .fileSize(GetSize.getSize(multipartFile.getSize()))
                     .parentFolderId(folderId)
+                    .postfix(postfix)
+                    .fileType(type)
                     .createdTime(date).build());
         }
+        PutObjectRequest request = new PutObjectRequest("xpu", objectKey);
+        request.setProgressListener(new ProgressListener() {
+
+            @Override
+            public void progressChanged(ProgressStatus status) {
+                // 获取上传平均速率
+                System.out.println("AverageSpeed:" + status.getAverageSpeed());
+                // 获取上传进度百分比
+                System.out.println("TransferPercentage:" + status.getTransferPercentage());
+                session.setAttribute("status", status);
+            }
+        });
         obsClient.putObject("xpu", objectKey, inputStream);
         inputStream.close();
         obsClient.close();
@@ -214,9 +238,9 @@ public class FileController {
      * @return
      */
     @GetMapping("/file/delete")
-    public String toDeletePage(Integer folderId, Integer fileId) {
+    public String toDeletePage(Integer folderId, Integer fileId) throws IOException {
         String fileName;
-        if (folderId == 0 || folderId == null) {
+        if (folderId == 0) {
             //当前目录为根目录
             CloudFile file = fileService.getFileByFileId(fileId, 1);
             fileName = file.getFileName();
@@ -229,8 +253,37 @@ public class FileController {
             fileName = prefix + objectKey;
 
         }
+        //上传文件有速度,在上传未完成前删除会报null
         fileService.deleteFile(fileId);
         obsClient.deleteObject("xpu", fileName);
+        obsClient.close();
+        return "redirect:/file";
+    }
+
+    @PostMapping("/file/rename")
+    public String renameFile(Integer fileId, Integer folderId, String fileName) throws IOException {
+        CloudFile file = fileService.getFileByFileId(fileId, 1);
+        if (folderId == 0) {
+            //如果是根目录
+            SetObjectMetadataRequest request = new SetObjectMetadataRequest("xpu", file.getFileName());
+            //更新OBS文件名
+            request.setObjectKey(fileName);
+            //更新数据库文件名
+            fileService.updateFileName(fileId, fileName, 1);
+            request.setObjectKey(fileName);
+            obsClient.setObjectMetadata(request);
+            obsClient.close();
+        } else {
+            //不是根目录
+            String path = folderService.findFolderPath(1, folderId);
+            //更新OBS文件名
+            SetObjectMetadataRequest request = new SetObjectMetadataRequest("xpu", path + file.getFileName());
+            request.setObjectKey(path + fileName);
+            obsClient.setObjectMetadata(request);
+            //更新数据库文件名
+            fileService.updateFileName(fileId, fileName, 1);
+            obsClient.close();
+        }
         return "redirect:/file?folderId=" + folderId;
     }
 
@@ -280,8 +333,36 @@ public class FileController {
      */
     @GetMapping("/folder/delete")
     public String deleteFolder(Integer folderId) {
-
-        return "";
+        //先OBS删除再删数据库,否则会查询为空
+        String objectKey = folderService.findFolderPath(1, folderId);
+        obsClient.deleteObject("xpu", objectKey);
+        deleteFolderF(folderId);
+        return "redirect:/file?folderId=0";
     }
+
+    /**
+     * 递归删除文件夹里面的所有文件和子文件夹
+     *
+     * @param folderId
+     */
+    public void deleteFolderF(Integer folderId) {
+        //获得当前文件夹下所有子文件夹
+        List<Folder> folders = folderService.findSonFolder(1, folderId);
+        //获取当前文件夹下的所有文件
+        List<CloudFile> files = fileService.findAllFiles(1, folderId);
+        if (files.size() != 0) {
+            for (int i = 0; i < files.size(); i++) {
+                Integer fileId = files.get(i).getFileId();
+                fileService.deleteFile(fileId);
+            }
+        }
+        if (folders.size() != 0) {
+            for (int i = 0; i < folders.size(); i++) {
+                deleteFolderF(folders.get(i).getFolderId());
+            }
+        }
+        folderService.deleteFolder(1, folderId);
+    }
+
 
 }

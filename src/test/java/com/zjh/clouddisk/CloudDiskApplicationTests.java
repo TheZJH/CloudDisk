@@ -17,7 +17,7 @@ class CloudDiskApplicationTests {
 
     @Test
     public void  delete(){
-        obsClient.deleteObject("xpu","测试/");
+        obsClient.deleteObject("xpu","test/");
     }
 
 }

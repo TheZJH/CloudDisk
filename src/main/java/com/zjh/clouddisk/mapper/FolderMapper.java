@@ -61,9 +61,24 @@ public interface FolderMapper {
 
     /**
      * 添加文件夹
+     *
      * @param folder
      * @return
      */
     @Insert("insert into folder(folder_name,parent_folder_id,bucket_id,time,folder_path)values(#{folderName},#{parentFolderId},#{bucketId},#{time},#{folderPath})")
     int addFolder(Folder folder);
+
+    /**
+     * 查询当前文件夹的的子文件夹
+     *
+     * @param bucketId
+     * @param folderId
+     * @return
+     */
+    @Select("select * from folder where bucket_id=#{bucketId} and parent_folder_id=#{folderId}")
+    @ResultMap("folderMap")
+    List<Folder> findSonFolder(Integer bucketId, Integer folderId);
+
+    @Delete("delete from folder where bucket_id=#{bucketId} and folder_id=#{folderId}")
+    int deleteFolder(Integer bucketId, Integer folderId);
 }

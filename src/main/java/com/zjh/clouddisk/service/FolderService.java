@@ -1,6 +1,7 @@
 package com.zjh.clouddisk.service;
 
 import com.zjh.clouddisk.dao.Folder;
+
 import java.util.List;
 
 /**
@@ -9,8 +10,16 @@ import java.util.List;
  */
 public interface FolderService {
     List<Folder> findAllRootFolder(Integer bucketId);
-    List<Folder> findFolder(Integer bucketId,Integer folderId);
+
+    List<Folder> findFolder(Integer bucketId, Integer folderId);
+
     String findFolderPath(Integer bucketId, Integer folderId);
+
     Folder findParentFolderId(Integer bucketId, Integer parentFolderId);
+
     int addFolder(Folder folder);
+
+    List<Folder> findSonFolder(Integer bucketId, Integer folderId);
+
+    int deleteFolder(Integer bucketId, Integer folderId);
 }

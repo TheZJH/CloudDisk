@@ -117,7 +117,7 @@
                         <ul id="page-delete" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
                         </ul>
                     </li>
-                    <li class=" ">
+                    <li class="" th:if="${session.loginUser.role} eq 0">
                         <a href="#otherpage" class="collapsed" data-toggle="collapse" aria-expanded="false">
                             <i class="lab la-wpforms iq-arrow-left"></i><span>管理</span>
                             <i class="las la-angle-right iq-arrow-right arrow-active"></i>

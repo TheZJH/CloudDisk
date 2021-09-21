@@ -16,7 +16,7 @@ import lombok.Data;
 public class CloudFile implements Serializable {
     private Integer fileId;
 
-    private String fileType;
+    private Integer fileType;
 
     private String fileAuthor;
 
@@ -30,7 +30,7 @@ public class CloudFile implements Serializable {
 
     private String filePath;
 
-    private String remark;
+    private String postfix;
 
     private String fileTag;
 
@@ -38,7 +38,7 @@ public class CloudFile implements Serializable {
 
     private Integer bucketId;
 
-    public CloudFile(Integer fileId, String fileType, String fileAuthor, Date createdTime, Date updateTime, String fileSize, String fileName, String filePath, String remark, String fileTag, Integer parentFolderId, Integer bucketId) {
+    public CloudFile(Integer fileId, Integer fileType, String fileAuthor, Date createdTime, Date updateTime, String fileSize, String fileName, String filePath, String postfix, String fileTag, Integer parentFolderId, Integer bucketId) {
         this.fileId = fileId;
         this.fileType = fileType;
         this.fileAuthor = fileAuthor;
@@ -47,7 +47,7 @@ public class CloudFile implements Serializable {
         this.fileSize = fileSize;
         this.fileName = fileName;
         this.filePath = filePath;
-        this.remark = remark;
+        this.postfix = postfix;
         this.fileTag = fileTag;
         this.parentFolderId = parentFolderId;
         this.bucketId = bucketId;

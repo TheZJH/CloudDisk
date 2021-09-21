@@ -11,11 +11,13 @@ import java.util.List;
 public interface FileService {
     List<CloudFile> findAllRootFile(Integer bucketId);
 
-    List<CloudFile> findAllFiles(Integer bucketId,Integer folderId);
+    List<CloudFile> findAllFiles(Integer bucketId, Integer folderId);
 
     CloudFile getFileByFileId(Integer fileId, Integer bucketId);
 
     int addFile(CloudFile file);
 
     int deleteFile(Integer fileId);
+
+    int updateFileName(Integer fileId, String fileName, Integer bucketId);
 }

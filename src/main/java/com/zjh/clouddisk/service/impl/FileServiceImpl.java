@@ -41,4 +41,9 @@ public class FileServiceImpl implements FileService {
     public int deleteFile(Integer fileId) {
         return fileMapper.deleteFile(fileId);
     }
+
+    @Override
+    public int updateFileName(Integer fileId, String fileName, Integer bucketId) {
+        return fileMapper.updateFileName(fileId, fileName, bucketId);
+    }
 }

@@ -26,7 +26,7 @@ public interface FileMapper {
             @Result(column = "file_size", property = "fileSize"),
             @Result(column = "file_name", property = "fileName"),
             @Result(column = "file_path", property = "filePath"),
-            @Result(column = "remark", property = "remark"),
+            @Result(column = "postfix", property = "postfix"),
             @Result(column = "file_tag", property = "fileTag"),
             @Result(column = "parent_folder_id", property = "parentFolderId"),
             @Result(column = "bucket_id", property = "bucketId"),
@@ -55,14 +55,18 @@ public interface FileMapper {
     @ResultMap("fileMap")
     CloudFile getFileByFileId(Integer fileId, Integer bucketId);
 
-    @Insert("insert into file(file_author,created_time,file_size,file_name,file_path,parent_folder_id,bucket_id) values(#{fileAuthor},#{createdTime},#{fileSize},#{fileName},#{filePath},#{parentFolderId},#{bucketId})")
+    @Insert("insert into file(file_author,created_time,file_size,file_name,file_path,parent_folder_id,bucket_id,postfix,file_type) values(#{fileAuthor},#{createdTime},#{fileSize},#{fileName},#{filePath},#{parentFolderId},#{bucketId},#{postfix},#{fileType})")
     int addFile(CloudFile file);
 
     /**
      * 根据文件Id删除文件
+     *
      * @param fileId
      * @return
      */
     @Delete("delete from file where file_id=#{fileId}")
     int deleteFile(Integer fileId);
+
+    @Update("update file set file_name =#{fileName} where file_id=#{fileId} and bucket_id=#{bucketId}")
+    int updateFileName(Integer fileId, String fileName, Integer bucketId);
 }
