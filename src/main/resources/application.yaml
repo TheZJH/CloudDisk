@@ -2,7 +2,7 @@ spring:
   servlet:
     #session过期时间
     session:
-      timeout: 60m
+      timeout: 3h
     #SpringBoot默认限制传输文件,改为-1为不限制
     multipart:
       max-file-size: -1

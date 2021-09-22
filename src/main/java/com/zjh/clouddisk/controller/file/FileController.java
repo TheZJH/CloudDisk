@@ -115,7 +115,7 @@ public class FileController {
     }
 
     /**
-     * 下载文件
+     * 下载文件,必须重新登录才会可以下载
      *
      * @param fileId
      * @param response
@@ -130,41 +130,71 @@ public class FileController {
         if (folderId == null || folderId == 0) {
             CloudFile file = fileService.getFileByFileId(fileId, 1);
             fileName = file.getFileName();
+            ObsObject obsObject = obsClient.getObject("xpu", file.getFileName());
+            InputStream input = obsObject.getObjectContent();
+            try {
+                //缓冲文件输入流
+                BufferedOutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+                //防止文件名出现乱码
+                final String userAgent = request.getHeader("USER-AGENT");
+                //IE浏览器
+                if (StringUtils.contains(userAgent, "MSIE")) {
+                    fileName = URLEncoder.encode(fileName, "UTF-8");
+                } else {
+                    //Google,火狐浏览器
+                    if (StringUtils.contains(userAgent, "Mozilla")) {
+                        fileName = new String(fileName.getBytes(), "ISO8859-1");
+                    } else {
+                        //其他浏览器
+                        fileName = URLEncoder.encode(fileName, "UTF-8");
+                    }
+                }
+                response.setContentType("application/x-download");
+                //设置让浏览器弹出下载框,之前忘了在filename后加=
+                response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+                IOUtils.copy(input, outputStream);
+                outputStream.flush();
+                outputStream.close();
+                input.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
             String prefix = folderService.findFolderPath(1, folderId);
             CloudFile file = fileService.getFileByFileId(fileId, 1);
             String name = file.getFileName();
             fileName = prefix + name;
-        }
-        ObsObject obsObject = obsClient.getObject("xpu", fileName);
-        InputStream input = obsObject.getObjectContent();
-        try {
-            //缓冲文件输入流
-            BufferedOutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
-            //防止文件名出现乱码
-            final String userAgent = request.getHeader("USER-AGENT");
-            //IE浏览器
-            if (StringUtils.contains(userAgent, "MSIE")) {
-                fileName = URLEncoder.encode(fileName, "UTF-8");
-            } else {
-                //Google,火狐浏览器
-                if (StringUtils.contains(userAgent, "Mozilla")) {
-                    fileName = new String(fileName.getBytes(), "ISO8859-1");
-                } else {
-                    //其他浏览器
+            ObsObject obsObject = obsClient.getObject("xpu", file.getFileName());
+            InputStream input = obsObject.getObjectContent();
+            try {
+                //缓冲文件输入流
+                BufferedOutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+                //防止文件名出现乱码
+                final String userAgent = request.getHeader("USER-AGENT");
+                //IE浏览器
+                if (StringUtils.contains(userAgent, "MSIE")) {
                     fileName = URLEncoder.encode(fileName, "UTF-8");
+                } else {
+                    //Google,火狐浏览器
+                    if (StringUtils.contains(userAgent, "Mozilla")) {
+                        fileName = new String(fileName.getBytes(), "ISO8859-1");
+                    } else {
+                        //其他浏览器
+                        fileName = URLEncoder.encode(fileName, "UTF-8");
+                    }
                 }
+                response.setContentType("application/x-download");
+                //设置让浏览器弹出下载框,之前忘了在filename后加=
+                response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+                IOUtils.copy(input, outputStream);
+                outputStream.flush();
+                outputStream.close();
+                input.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            response.setContentType("application/x-download");
-            //设置让浏览器弹出下载框,之前忘了在filename后加=
-            response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
-            IOUtils.copy(input, outputStream);
-            outputStream.flush();
-            outputStream.close();
-            input.close();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
         return "redirect:/file?folderId=" + folderId;
     }
 
@@ -212,21 +242,9 @@ public class FileController {
                     .fileType(type)
                     .createdTime(date).build());
         }
-        PutObjectRequest request = new PutObjectRequest("xpu", objectKey);
-        request.setProgressListener(new ProgressListener() {
-
-            @Override
-            public void progressChanged(ProgressStatus status) {
-                // 获取上传平均速率
-                System.out.println("AverageSpeed:" + status.getAverageSpeed());
-                // 获取上传进度百分比
-                System.out.println("TransferPercentage:" + status.getTransferPercentage());
-                session.setAttribute("status", status);
-            }
-        });
         obsClient.putObject("xpu", objectKey, inputStream);
         inputStream.close();
-        obsClient.close();
+        //obsClient.close(),关闭导致上传后无法下载
         return "redirect:/file?folderId=" + folderId;
     }
 
@@ -253,10 +271,10 @@ public class FileController {
             fileName = prefix + objectKey;
 
         }
-        //上传文件有速度,在上传未完成前删除会报null
+        //上传文件有速度,在上传未完成前删除会报null,应该
         fileService.deleteFile(fileId);
         obsClient.deleteObject("xpu", fileName);
-        obsClient.close();
+        //obsClient.close();
         return "redirect:/file";
     }
 
@@ -277,7 +295,7 @@ public class FileController {
             //更新数据库文件名
             fileService.updateFileName(fileId, fileName, 1);
 
-            obsClient.close();
+            //obsClient.close();
         } else {
             //不是根目录
             String path = folderService.findFolderPath(1, folderId);
@@ -287,7 +305,7 @@ public class FileController {
             obsClient.setObjectMetadata(request);
             //更新数据库文件名
             fileService.updateFileName(fileId, fileName, 1);
-            obsClient.close();
+            //obsClient.close();
         }
         return "redirect:/file?folderId=" + folderId;
     }
