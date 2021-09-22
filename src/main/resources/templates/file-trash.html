@@ -1,0 +1,223 @@
+﻿<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common::commonhead">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>CloudBOX | Responsive Bootstrap 4 Admin Dashboard Template</title>
+</head>
+<body class="  ">
+<!-- loader Start -->
+<div id="loading">
+    <div id="loading-center">
+    </div>
+</div>
+<!-- loader END -->
+<!-- Wrapper Start -->
+<div class="wrapper">
+    <div th:replace="common::commonbar"></div>
+    <div class="content-page">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card-transparent card-block card-stretch card-height mb-3">
+                        <div class="d-flex justify-content-between">
+                            <div class="select-dropdown input-prepend input-append">
+                                <div class="btn-group">
+                                    <label data-toggle="dropdown">
+                                        <div class="dropdown-toggle search-query">我的文件<i
+                                                class="las la-angle-down ml-3"></i></div>
+                                        <span class="search-replace"></span>
+                                        <span class="caret"><!--icon--></span>
+                                    </label>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <div class="item"><i class="ri-folder-add-line pr-3"></i>New Folder</div>
+                                        </li>
+                                        <li>
+                                            <div class="item"><i class="ri-file-upload-line pr-3"></i>Upload Files</div>
+                                        </li>
+                                        <li>
+                                            <div class="item"><i class="ri-folder-upload-line pr-3"></i>Upload Folders
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="dashboard1-dropdown d-flex align-items-center">
+                                <div class="dashboard1-info">
+                                    <a href="#calander" class="collapsed" data-toggle="collapse" aria-expanded="false">
+                                        <i class="ri-arrow-down-s-line"></i>
+                                    </a>
+                                    <ul id="calander" class="iq-dropdown collapse list-inline m-0 p-0 mt-2">
+                                        <li class="mb-2">
+                                            <a href="#" data-toggle="tooltip" data-placement="right" title="Calander"><i
+                                                    class="las la-calendar iq-arrow-left"></i></a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a href="#" data-toggle="tooltip" data-placement="right" title="Keep"><i
+                                                    class="las la-lightbulb iq-arrow-left"></i></a>
+                                        </li>
+                                        <li>
+                                            <a href="#" data-toggle="tooltip" data-placement="right" title="Tasks"><i
+                                                    class="las la-tasks iq-arrow-left"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-xl-8">
+                    <div class="card card-block card-stretch card-height files-table">
+                        <div class="card-header d-flex justify-content-between">
+                            <div class="header-title">
+                                <h4 class="card-title">回收站</h4>
+                            </div>
+                            <div class="card-header-toolbar d-flex align-items-center">
+                                <a th:href="@{/file(folderId=0)}" class=" view-more">View All</a>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="table-responsive">
+                                <table class="table mb-0 table-borderless tbl-server-info">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Members</th>
+                                        <th scope="col">Last Edit</th>
+                                        <th scope="col">Size</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="cloudfile:${indexFile}">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-small bg-danger rounded mr-3">
+                                                    <i class="ri-file-excel-line"></i>
+                                                </div>
+                                                <div data-load-file="file" data-load-target="#resolte-contaniner"
+                                                     data-url="assets/vendor/doc-viewer/files/demo.pdf"
+                                                     data-toggle="modal" data-target="#exampleModal"
+                                                     data-title="Weekly-report.pdf" style="cursor: pointer;">
+                                                    <span th:text="${cloudfile.fileName}"></span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td th:text="${cloudfile.fileAuthor}">Me</td>
+                                        <td th:text="${cloudfile.createdTime}">jan 21, 2020 me</td>
+                                        <td th:text="${cloudfile.fileSize}">02 MB</td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <span class="dropdown-toggle" id="dropdownMenuButton6"
+                                                      data-toggle="dropdown">
+                                                    <i class="ri-more-fill"></i>
+                                                </span>
+                                                <div class="dropdown-menu dropdown-menu-right"
+                                                     aria-labelledby="dropdownMenuButton6">
+                                                    <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>
+                                                    <a class="dropdown-item" href="#"><i
+                                                            class="ri-delete-bin-6-fill mr-2"></i>Delete</a>
+                                                    <a class="dropdown-item" href="#"><i
+                                                            class="ri-pencil-fill mr-2"></i>Edit</a>
+                                                    <a class="dropdown-item" href="#"><i
+                                                            class="ri-printer-fill mr-2"></i>Print</a>
+                                                    <a class="dropdown-item" href="#"><i
+                                                            class="ri-file-download-fill mr-2"></i>Download</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card card-block card-stretch card-height ">
+                        <div class="card-header d-flex justify-content-between">
+                            <div class="header-title">
+                                <h4 class="card-title">Statistic</h4>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="layout-1-chart" style="min-height: 220px;"></div>
+                            <div class="row mt-4">
+                                <div class="col-lg-6 col-md-6 col-6">
+                                    <div class="media align-items-center">
+                                        <div class="icon iq-icon-box bg-primary rounded icon-statistic">
+                                            <i class="las la-long-arrow-alt-down"></i>
+                                        </div>
+                                        <div class="media-body ml-3">
+                                            <p class="mb-0">Downloads</p>
+                                            <h5>12,594</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-6">
+                                    <div class="media align-items-center">
+                                        <div class="icon iq-icon-box bg-light rounded icon-statistic">
+                                            <i class="las la-long-arrow-alt-up"></i>
+                                        </div>
+                                        <div class="media-body ml-3">
+                                            <p class="mb-0">Uploads</p>
+                                            <h5>1,458</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card card-block card-stretch card-height  plan-bg">
+                        <div class="card-body">
+                            <h4 class="mb-3 text-white">Unlock Your plan</h4>
+                            <p>Expanded Storage, Access To<br> More Features On CloudBOX</p>
+                            <div class="row align-items-center justify-content-between">
+                                <div class="col-6 go-white ">
+                                    <a href="#" class="btn d-inline-block mt-5">Go Premium</a>
+                                </div>
+                                <div class="col-6">
+                                    <img src="assets/images/layouts/mydrive/lock-bg.png" class="img-fluid" alt="image1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card card-block card-stretch card-height">
+                        <div class="card-header d-flex justify-content-between pb-0">
+                            <div class="header-title">
+                                <h4 class="card-title">Storage</h4>
+                            </div>
+                            <div class="card-header-toolbar d-flex align-items-center">
+                                <div class="dropdown">
+                                    <span class="dropdown-toggle btn  dropdown-bg border border-primary text-primary rounded"
+                                          id="dropdownMenuButton11"
+                                          data-toggle="dropdown">
+                                        Monthly<i class="ri-arrow-down-s-line ml-1"></i>
+                                    </span>
+                                    <div class="dropdown-menu dropdown-menu-right shadow-none"
+                                         aria-labelledby="dropdownMenuButton11">
+                                        <a class="dropdown-item" href="#">Monthly</a>
+                                        <a class="dropdown-item" href="#">Weekly</a>
+                                        <a class="dropdown-item" href="#">Yearly</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <div id="layout-1-chart2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--包含foot-->
+<div th:replace="common::commonscript"></div>
+</body>
+</html>

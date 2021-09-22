@@ -84,4 +84,7 @@ public interface FolderMapper {
 
     @Select("SELECT *FROM folder  ORDER BY time DESC LIMIT 0,4")
     List<Folder> indexFolder();
+
+    @Select("select folder_id from folder where folder_path=#{filePath}")
+    Integer findFolderId(String filePath);
 }

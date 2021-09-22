@@ -115,7 +115,7 @@ public class LoginController {
         List<CloudFile> files = fileMapper.indexFile();
         List<Folder> folders = folderMapper.indexFolder();
         model.addAttribute("indexFile", files);
-        model.addAttribute("indexFolder",folders);
+        model.addAttribute("indexFolder", folders);
         return "index";
     }
 

@@ -13,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class User {
+public class User implements Serializable{
     /**
      * 用户ID
      */

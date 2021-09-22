@@ -2,8 +2,7 @@ package com.zjh.clouddisk;
 
 
 import com.obs.services.ObsClient;
-import com.obs.services.model.BucketQuota;
-import com.obs.services.model.BucketStorageInfo;
+import com.obs.services.model.*;
 import com.obs.services.model.fs.RenameRequest;
 import com.obs.services.model.fs.RenameResult;
 import com.zjh.clouddisk.util.CloudConfig;
@@ -53,8 +52,20 @@ class CloudDiskApplicationTests {
         //桶配额
         System.out.println("\t" + quota.getBucketQuota());
     }
+
     @Test
-    public void createBucket(){
+    public void createBucket() {
         obsClient.createBucket("32842384208");
     }
+
+    @Test
+    public void fileShare() {
+        Long expireSeconds = 360000L;
+        TemporarySignatureRequest request = new TemporarySignatureRequest(HttpMethodEnum.GET, expireSeconds);
+        request.setBucketName("xpu");
+        request.setObjectKey("win10 (1).jpg");
+        TemporarySignatureResponse response = obsClient.createTemporarySignature(request);
+        System.out.println(response.getSignedUrl());
+    }
+
 }

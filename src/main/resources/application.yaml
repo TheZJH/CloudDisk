@@ -2,7 +2,7 @@ spring:
   servlet:
     #session过期时间
     session:
-      timeout: 3h
+      timeout: 12h
     #SpringBoot默认限制传输文件,改为-1为不限制
     multipart:
       max-file-size: -1
@@ -39,4 +39,4 @@ spring:
     resources:
       static-locations: classpath:/templates/,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
 mybatis:
-  mapper-locations: classpath:mapper/*Dao.xml
+  mapper-locations: classpath:mapper/*Mapper.xml

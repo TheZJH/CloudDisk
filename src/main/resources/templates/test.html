@@ -5,22 +5,5 @@
     <title>test</title>
 </head>
 <body>
-<table>
-    <tr>
-        <td>
-            编号
-        </td>
-    </tr>
-    <tr th:each="file,state:${fileList}">
-        <td>
-            <span th:text="${file.fileName}"></span>
-        </td>
-    </tr>
-    <tr th:each="folder,state:${folderList}">
-        <td>
-            <span th:text="${folder.folderName}"></span>
-        </td>
-    </tr>
-</table>
 </body>
 </html>

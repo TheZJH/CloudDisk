@@ -263,6 +263,7 @@ public class FileController {
             CloudFile file = fileService.getFileByFileId(fileId, 1);
             fileName = file.getFileName();
             //直接删除
+
         } else {
             //不是根目录
             CloudFile file = fileService.getFileByFileId(fileId, 1);
@@ -274,8 +275,7 @@ public class FileController {
         //上传文件有速度,在上传未完成前删除会报null,应该
         fileService.deleteFile(fileId);
         obsClient.deleteObject("xpu", fileName);
-        //obsClient.close();
-        return "redirect:/file";
+        return "redirect:/file?folderId=" + folderId;
     }
 
     @PostMapping("/file/rename")
@@ -291,11 +291,9 @@ public class FileController {
             //目标对象名
             request.setNewObjectKey(fileName);
             //更新OBS文件名
-            RenameResult result = obsClient.renameFile(request);
+            obsClient.renameFile(request);
             //更新数据库文件名
             fileService.updateFileName(fileId, fileName, 1);
-
-            //obsClient.close();
         } else {
             //不是根目录
             String path = folderService.findFolderPath(1, folderId);
@@ -305,7 +303,6 @@ public class FileController {
             obsClient.setObjectMetadata(request);
             //更新数据库文件名
             fileService.updateFileName(fileId, fileName, 1);
-            //obsClient.close();
         }
         return "redirect:/file?folderId=" + folderId;
     }
@@ -386,6 +383,5 @@ public class FileController {
         }
         folderService.deleteFolder(1, folderId);
     }
-
 
 }

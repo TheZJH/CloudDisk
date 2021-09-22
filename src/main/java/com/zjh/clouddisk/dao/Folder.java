@@ -13,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class Folder {
+public class Folder implements Serializable {
     private Integer folderId;
 
     private String folderName;

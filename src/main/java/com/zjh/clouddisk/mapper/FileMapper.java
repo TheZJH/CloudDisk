@@ -25,7 +25,7 @@ public interface FileMapper {
             @Result(column = "update_time", property = "updateTime"),
             @Result(column = "file_size", property = "fileSize"),
             @Result(column = "file_name", property = "fileName"),
-            @Result(column = "file_path", property = "filePath"),
+            @Result(column = "file_delete", property = "fileDelete"),
             @Result(column = "postfix", property = "postfix"),
             @Result(column = "objectKey", property = "objectKey"),
             @Result(column = "parent_folder_id", property = "parentFolderId"),
@@ -55,7 +55,7 @@ public interface FileMapper {
     @ResultMap("fileMap")
     CloudFile getFileByFileId(Integer fileId, Integer bucketId);
 
-    @Insert("insert into file(file_author,created_time,file_size,file_name,file_path,parent_folder_id,bucket_id,postfix,file_type) values(#{fileAuthor},#{createdTime},#{fileSize},#{fileName},#{filePath},#{parentFolderId},#{bucketId},#{postfix},#{fileType})")
+    @Insert("insert into file(file_author,created_time,file_size,file_name,file_delete,parent_folder_id,bucket_id,postfix,file_type) values(#{fileAuthor},#{createdTime},#{fileSize},#{fileName},#{fileDelete},#{parentFolderId},#{bucketId},#{postfix},#{fileType})")
     int addFile(CloudFile file);
 
     /**
@@ -73,4 +73,6 @@ public interface FileMapper {
     @Select("SELECT *FROM FILE  ORDER BY created_time DESC LIMIT 0,5")
     @ResultMap("fileMap")
     List<CloudFile> indexFile();
+
+
 }
