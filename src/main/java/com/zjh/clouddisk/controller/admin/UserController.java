@@ -37,7 +37,7 @@ public class UserController {
      * 添加用户
      *
      * @param realName
-     * @param bucketName
+     * @param
      * @param phone
      * @param email
      * @param role
@@ -46,14 +46,14 @@ public class UserController {
      * @return
      */
     @PostMapping("/user/add")
-    public String addUser(String realName, String bucketName, Integer phone, String email, Integer role,
+    public String addUser(String realName, @RequestParam("bucketName") Integer folderId, Integer phone, String email, Integer role,
                           String username, String password) {
-        Integer bucketId = bucketMapper.bucketId(bucketName);
 
         userService.addUser(User.builder()
                 .realName(realName)
-                .bucketId(bucketId)
+                .bucketId(1)
                 .phone(phone)
+                .folderId(folderId)
                 .email(email).role(role).username(username).password(password).registerTime(date).build());
         return "redirect:/user/add";
     }
@@ -71,15 +71,17 @@ public class UserController {
         return "redirect:/user/list";
     }
 
-    @GetMapping("test")
-    public String test() {
-        return "page-android";
-    }
-
     @GetMapping("/user/profile/edit")
     public String userProfileEdit(HttpSession session, Model model) {
         User user = (User) session.getAttribute("loginUser");
         Integer userId = user.getUserId();
         return "user-profile-edit";
+    }
+
+    @GetMapping("/user/update")
+    public String userFileEdit(HttpSession session, Integer userId) {
+        User userById = userService.findUserById(userId);
+        session.setAttribute("user", userById);
+        return "user-profile";
     }
 }

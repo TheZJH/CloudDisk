@@ -225,15 +225,16 @@
                                                         <a class="dropdown-item"
                                                            th:href="@{/file/delete(folderId=${folderId},fileId=${cloudfile.fileId})}"><i
                                                                 class="ri-delete-bin-6-fill mr-2"></i>删除</a>
-                                                            <div class="dropdown-item">
-                                                                <span>复制文件</span>
-                                                                <i class="ri-file-upload-line pr-3"></i>
-                                                                <form th:action="@{/file/copy(fileId=${cloudfile.fileId},folderId=${folderId})}"
-                                                                      method="post">
-                                                                    <input type="text" name="filePath" placeholder="请输入要复制的文件路径"/>
-                                                                    <input name="submit" value="提交" type="submit"/>
-                                                                </form>
-                                                            </div>
+                                                        <div class="dropdown-item">
+                                                            <span>复制文件</span>
+                                                            <i class="ri-file-upload-line pr-3"></i>
+                                                            <form th:action="@{/file/copy(fileId=${cloudfile.fileId},folderId=${folderId})}"
+                                                                  method="post">
+                                                                <input type="text" name="filePath"
+                                                                       placeholder="请输入要复制的文件路径"/>
+                                                                <input name="submit" value="提交" type="submit"/>
+                                                            </form>
+                                                        </div>
                                                         <div class="dropdown-item">
                                                             <i class="ri-printer-fill mr-2"></i>
                                                             <span>重命名</span>

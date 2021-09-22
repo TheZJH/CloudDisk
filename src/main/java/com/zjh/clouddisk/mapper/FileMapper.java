@@ -55,7 +55,7 @@ public interface FileMapper {
     @ResultMap("fileMap")
     CloudFile getFileByFileId(Integer fileId, Integer bucketId);
 
-    @Insert("insert into file(file_author,created_time,file_size,file_name,file_delete,parent_folder_id,bucket_id,postfix,file_type) values(#{fileAuthor},#{createdTime},#{fileSize},#{fileName},#{fileDelete},#{parentFolderId},#{bucketId},#{postfix},#{fileType})")
+    @Insert("insert into file(file_author,created_time,file_size,file_name,file_delete,parent_folder_id,bucket_id,postfix,file_type,objectKey) values(#{fileAuthor},#{createdTime},#{fileSize},#{fileName},#{fileDelete},#{parentFolderId},#{bucketId},#{postfix},#{fileType},#{objectKey})")
     int addFile(CloudFile file);
 
     /**

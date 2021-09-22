@@ -28,7 +28,8 @@ public interface UserMapper {
             @Result(column = "register_time", property = "registerTime"),
             @Result(column = "image_path", property = "imagePath"),
             @Result(column = "role", property = "role"),
-            @Result(column = "phone", property = "phone")
+            @Result(column = "phone", property = "phone"),
+            @Result(column = "folder_id", property = "folderId")
     })
     User login(String username, String password);
 
@@ -41,9 +42,13 @@ public interface UserMapper {
     @ResultMap("userMap")
     List<User> findAll();
 
-    @Insert("insert into user(real_name,bucket_id,user_name,email,password,register_time,role,phone) values(#{realName},#{bucketId},#{username},#{email},#{password},#{registerTime},#{role},#{phone})")
+    @Insert("insert into user(real_name,bucket_id,user_name,email,password,register_time,role,phone,folder_id) values(#{realName},#{bucketId},#{username},#{email},#{password},#{registerTime},#{role},#{phone},#{folderId})")
     int addUser(User user);
 
     @Delete("delete from user where user_id=#{userId}")
     int deleteUser(Integer userId);
+
+    @Select("select * from user where user_id =#{userId}")
+    @ResultMap("userMap")
+    User findUserById(Integer userId);
 }

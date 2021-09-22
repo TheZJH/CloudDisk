@@ -13,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class User implements Serializable{
+public class User implements Serializable {
     /**
      * 用户ID
      */
@@ -61,10 +61,12 @@ public class User implements Serializable{
 
     private Integer phone;
 
+    private Integer folderId;
+
     public User() {
     }
 
-    public User(Integer userId, String realName, Integer bucketId, String username, String email, String password, Date registerTime, String imagePath, Integer role, Integer phone) {
+    public User(Integer userId, String realName, Integer bucketId, String username, String email, String password, Date registerTime, String imagePath, Integer role, Integer phone, Integer folderId) {
         this.userId = userId;
         this.realName = realName;
         this.bucketId = bucketId;
@@ -75,5 +77,6 @@ public class User implements Serializable{
         this.imagePath = imagePath;
         this.role = role;
         this.phone = phone;
+        this.folderId = folderId;
     }
 }

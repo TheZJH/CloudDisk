@@ -7,11 +7,13 @@ import com.obs.services.model.fs.RenameResult;
 import com.zjh.clouddisk.dao.Folder;
 import com.zjh.clouddisk.dao.CloudFile;
 import com.zjh.clouddisk.dao.User;
+import com.zjh.clouddisk.mapper.FileRootMapper;
 import com.zjh.clouddisk.service.FolderService;
 import com.zjh.clouddisk.service.FileService;
 import com.zjh.clouddisk.util.CloudConfig;
 import com.zjh.clouddisk.util.GetSize;
 import com.zjh.clouddisk.util.GetType;
+import com.zjh.clouddisk.util.Md5Util;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,13 +22,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.util.StringUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -43,7 +43,8 @@ public class FileController {
     @Autowired
     private FolderService folderService;
 
-
+    @Resource
+    private FileRootMapper fileRootMapper;
     /**
      * 创建ObsClient实例
      */
@@ -62,6 +63,14 @@ public class FileController {
     @GetMapping("/file")
     public String toFilePage(Integer folderId, Model model, HttpSession session) {
         User user = (User) session.getAttribute("loginUser");
+        Integer userId = user.getUserId();
+        Boolean flag = false;
+        List<Integer> file = fileRootMapper.findFile(userId);
+        for (Integer f : file) {
+            if (f == folderId) {
+                flag = true;
+            }
+        }
         List<CloudFile> fileList = null;
         List<Folder> folderList = null;
         List<Folder> pathList = new ArrayList<>();
@@ -71,18 +80,24 @@ public class FileController {
             folderList = folderService.findAllRootFolder(1);
             fileList = fileService.findAllRootFile(1);
         } else {
-            //说明不是根目录,folderId就是子文件和文件夹的parentId
-            folderList = folderService.findFolder(1, folderId);
-            fileList = fileService.findAllFiles(1, folderId);
-            Folder newFolder = folderService.findParentFolderId(1, folderId);
+            if (flag == true || user.getRole() == 0) {
+                //说明不是根目录,folderId就是子文件和文件夹的parentId
+                folderList = folderService.findFolder(1, folderId);
+                fileList = fileService.findAllFiles(1, folderId);
+                Folder newFolder = folderService.findParentFolderId(1, folderId);
 
-            Folder temp = newFolder;
-            pathList.add(temp);
-            while (temp.getParentFolderId() != 0) {
-                temp = folderService.findParentFolderId(1, temp.getParentFolderId());
+                Folder temp = newFolder;
                 pathList.add(temp);
+                while (temp.getParentFolderId() != 0) {
+                    temp = folderService.findParentFolderId(1, temp.getParentFolderId());
+                    pathList.add(temp);
+                }
+            } else {
+                session.setAttribute("msg", "你没有权限访问这个文件夹别乱点了");
+                return "pages-error";
             }
         }
+
         Collections.reverse(pathList);
         model.addAttribute("folderList", folderList);
         model.addAttribute("fileList", fileList);
@@ -130,7 +145,7 @@ public class FileController {
         if (folderId == null || folderId == 0) {
             CloudFile file = fileService.getFileByFileId(fileId, 1);
             fileName = file.getFileName();
-            ObsObject obsObject = obsClient.getObject("xpu", file.getFileName());
+            ObsObject obsObject = obsClient.getObject("xpu", file.getObjectKey());
             InputStream input = obsObject.getObjectContent();
             try {
                 //缓冲文件输入流
@@ -209,29 +224,39 @@ public class FileController {
         //获取当前时间
         Date date = new Date();
         InputStream inputStream = multipartFile.getInputStream();
-        String objectKey;
+        String objectKey = Md5Util.getMD5(multipartFile);
+        String fileName;
+        CloudFile objectKey1 = fileRootMapper.getObjectKey(objectKey);
+        if (objectKey1 != null) {
+            //数据库中已经有此文件
+            if (objectKey1.getParentFolderId() == folderId) {
+                //说明两个在同一个文件夹下
+                session.setAttribute("msg", "此文件已经存在于当前文件夹下");
+                return "pages-error";
+            }
+        }
         if (folderId == null || folderId == 0) {
             //当前目录为根目录
-            objectKey = multipartFile.getOriginalFilename();
+            fileName = multipartFile.getOriginalFilename();
             //最后一个点出现的位置
-            int index = objectKey.lastIndexOf(".");
+            int index = fileName.lastIndexOf(".");
             //获取文件后缀名
-            String postfix = objectKey.substring(index, objectKey.length());
+            String postfix = fileName.substring(index, fileName.length());
             int type = GetType.getType(postfix);
             fileService.addFile(CloudFile.builder().
-                    fileName(objectKey)
+                    fileName(fileName)
                     .bucketId(1)
                     .parentFolderId(folderId)
                     .fileSize(GetSize.getSize(multipartFile.getSize()))
                     .postfix(postfix)
                     .fileType(type)
-                    .createdTime(date).build());
+                    .createdTime(date).objectKey(objectKey).build());
         } else {
             String prefix = folderService.findFolderPath(1, folderId);
-            objectKey = prefix + multipartFile.getOriginalFilename();
-            int index = objectKey.lastIndexOf(".");
+            fileName = prefix + multipartFile.getOriginalFilename();
+            int index = fileName.lastIndexOf(".");
             //获取文件后缀名
-            String postfix = objectKey.substring(index, objectKey.length());
+            String postfix = fileName.substring(index, fileName.length());
             int type = GetType.getType(postfix);
             fileService.addFile(CloudFile.builder().
                     fileName(multipartFile.getOriginalFilename())
@@ -239,7 +264,7 @@ public class FileController {
                     .fileSize(GetSize.getSize(multipartFile.getSize()))
                     .parentFolderId(folderId)
                     .postfix(postfix)
-                    .fileType(type)
+                    .fileType(type).objectKey(objectKey)
                     .createdTime(date).build());
         }
         obsClient.putObject("xpu", objectKey, inputStream);
@@ -257,53 +282,30 @@ public class FileController {
      */
     @GetMapping("/file/delete")
     public String toDeletePage(Integer folderId, Integer fileId) throws IOException {
-        String fileName;
+        String objectKey;
         if (folderId == 0) {
             //当前目录为根目录
             CloudFile file = fileService.getFileByFileId(fileId, 1);
-            fileName = file.getFileName();
+            objectKey = file.getObjectKey();
             //直接删除
 
         } else {
             //不是根目录
             CloudFile file = fileService.getFileByFileId(fileId, 1);
-            String objectKey = file.getFileName();
+            String name = file.getObjectKey();
             String prefix = folderService.findFolderPath(1, folderId);
-            fileName = prefix + objectKey;
+            objectKey = prefix + name;
 
         }
         //上传文件有速度,在上传未完成前删除会报null,应该
         fileService.deleteFile(fileId);
-        obsClient.deleteObject("xpu", fileName);
+        obsClient.deleteObject("xpu", objectKey);
         return "redirect:/file?folderId=" + folderId;
     }
 
     @PostMapping("/file/rename")
     public String renameFile(Integer fileId, Integer folderId, String fileName) throws IOException {
-        CloudFile file = fileService.getFileByFileId(fileId, 1);
-        if (folderId == 0) {
-            //如果是根目录
-            RenameRequest request = new RenameRequest();
-            //桶名
-            request.setBucketName("xpu");
-            //原对象完整文件名
-            request.setObjectKey(file.getFileName());
-            //目标对象名
-            request.setNewObjectKey(fileName);
-            //更新OBS文件名
-            obsClient.renameFile(request);
-            //更新数据库文件名
-            fileService.updateFileName(fileId, fileName, 1);
-        } else {
-            //不是根目录
-            String path = folderService.findFolderPath(1, folderId);
-            //更新OBS文件名
-            SetObjectMetadataRequest request = new SetObjectMetadataRequest("xpu", path + file.getFileName());
-            request.setObjectKey(path + fileName);
-            obsClient.setObjectMetadata(request);
-            //更新数据库文件名
-            fileService.updateFileName(fileId, fileName, 1);
-        }
+        fileRootMapper.changeFileName(fileName, fileId);
         return "redirect:/file?folderId=" + folderId;
     }
 
@@ -315,33 +317,60 @@ public class FileController {
      * @return
      */
     @PostMapping("/folder/update")
-    public String addFolder(Integer folderId, String folderName) {
+    public String addFolder(Integer folderId, String folderName, HttpSession session) {
+        User login = (User) session.getAttribute("loginUser");
+        Integer userId = login.getUserId();
+        Boolean flag = false;
+        List<Integer> file = fileRootMapper.findFile(userId);
+        for (Integer f : file) {
+            if (f == folderId) {
+                flag = true;
+            }
+        }
         Date date = new Date();
         String objectKey;
         if (folderId == 0 || folderId == null) {
             //向根目录添加文件夹
-            folderService.addFolder(Folder.builder()
-                    .folderName(folderName)
-                    .parentFolderId(folderId)
-                    .bucketId(1)
-                    .time(date)
-                    .folderPath(folderName + "/").build());
-            //在OBS下创建文件夹
-            objectKey = folderName + "/";
-
+            if (login.getRole() == 0) {
+                folderService.addFolder(Folder.builder()
+                        .folderName(folderName)
+                        .parentFolderId(folderId)
+                        .bucketId(1)
+                        .time(date)
+                        .folderPath(folderName + "/").build());
+                //在OBS下创建文件夹
+                objectKey = folderName + "/";
+            } else {
+                session.setAttribute("msg", "你没有权限访问这个文件夹别乱点了");
+                return "pages-error";
+            }
         } else {
-            //在其他目录下添加文件夹
-            String folderPath = folderService.findFolderPath(1, folderId);
-            folderService.addFolder(Folder.builder()
-                    .folderName(folderName)
-                    .parentFolderId(folderId)
-                    .bucketId(1)
-                    .time(date)
-                    .folderPath(folderPath + folderName + "/").build());
-            objectKey = folderPath + folderName + "/";
+            if (login.getRole() == 0 || flag == true) {
+                //在其他目录下添加文件夹
+                String folderPath = folderService.findFolderPath(1, folderId);
+                folderService.addFolder(Folder.builder()
+                        .folderName(folderName)
+                        .parentFolderId(folderId)
+                        .bucketId(1)
+                        .time(date)
+                        .folderPath(folderPath + folderName + "/").build());
+                Integer latestFolder = fileRootMapper.findLatestFolder();
+                //说明是个人文件夹
+                fileRootMapper.insertFolderUser(latestFolder, userId);
+                List<Integer> user = fileRootMapper.findUser(latestFolder);
+                //给其他群组成员文件权限
+                for (Integer u : user) {
+                    fileRootMapper.insertFolderUser(latestFolder, u);
+                }
 
+                objectKey = folderPath + folderName + "/";
+            } else {
+                session.setAttribute("msg", "你没有权限访问这个文件夹别乱点了");
+                return "pages-error";
+            }
         }
-        obsClient.putObject("xpu", objectKey, new ByteArrayInputStream(new byte[0]));
+        obsClient.putObject("xpu", objectKey, new
+                ByteArrayInputStream(new byte[0]));
         return "redirect:/file?folderId=" + folderId;
     }
 

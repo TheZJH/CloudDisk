@@ -9,6 +9,7 @@ import com.zjh.clouddisk.util.CloudConfig;
 import com.zjh.clouddisk.util.GetSize;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @SpringBootTest
@@ -68,4 +69,8 @@ class CloudDiskApplicationTests {
         System.out.println(response.getSignedUrl());
     }
 
+    @Test
+    public void Md5(MultipartFile file){
+
+    }
 }
