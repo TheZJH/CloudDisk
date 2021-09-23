@@ -24,13 +24,8 @@
                             <div class="iq-edit-list usr-edit">
                                 <ul class="iq-edit-profile d-flex nav nav-pills">
                                     <li class="col-md-3 p-0">
-                                        <a class="nav-link active" data-toggle="pill" href="#personal-information">
-                                            Personal Information
-                                        </a>
-                                    </li>
-                                    <li class="col-md-3 p-0">
                                         <a class="nav-link" data-toggle="pill" href="#chang-pwd">
-                                            Change Password
+                                            给群组添加用户
                                         </a>
                                     </li>
                                 </ul>
@@ -49,7 +44,7 @@
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <form th:action="@{/user/change}" method="post">
+                                        <form th:action="@{/group/upload}" method="post">
                                             <div class="form-group row align-items-center">
                                                 <div class="col-md-12">
                                                     <div class="profile-img-edit">

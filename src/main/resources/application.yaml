@@ -7,6 +7,7 @@ spring:
     multipart:
       max-file-size: -1
       max-request-size: -1
+  #服务器远程连接地址
   datasource:
     url: jdbc:mysql://139.9.153.121:3306/clouddisk?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root

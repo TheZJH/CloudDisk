@@ -1,5 +1,7 @@
 package com.zjh.clouddisk.util;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.math.BigDecimal;
 
 /**

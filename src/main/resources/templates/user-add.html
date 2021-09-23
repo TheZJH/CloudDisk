@@ -19,72 +19,11 @@
     <div class="content-page">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-xl-3 col-lg-4">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between">
-                            <div class="header-title">
-                                <h4 class="card-title">添加新用户</h4>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <form>
-                                <div class="form-group text-center">
-                                    <div class="d-flex justify-content-center">
-                                        <div class="crm-profile-img-edit position-relative">
-                                            <img class="crm-profile-pic rounded-circle avatar-100"
-                                                 src="assets/images/user/11.png" alt="profile-pic">
-                                            <div class="crm-p-image bg-primary">
-                                                <i class="las la-pen upload-button"></i>
-                                                <input class="file-upload" type="file" accept="image/*">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="img-extension mt-3">
-                                        <div class="d-inline-block align-items-center">
-                                            <span>Only</span>
-                                            <a href="javascript:void();">.jpg</a>
-                                            <a href="javascript:void();">.png</a>
-                                            <a href="javascript:void();">.jpeg</a>
-                                            <span>allowed</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>User Role:</label>
-                                    <select class="form-control" id="selectuserrole">
-                                        <option>Select</option>
-                                        <option>Web Designer</option>
-                                        <option>Web Developer</option>
-                                        <option>Tester</option>
-                                        <option>Php Developer</option>
-                                        <option>Ios Developer</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="furl">Facebook Url:</label>
-                                    <input type="text" class="form-control" id="furl" placeholder="Facebook Url">
-                                </div>
-                                <div class="form-group">
-                                    <label for="turl">Twitter Url:</label>
-                                    <input type="text" class="form-control" id="turl" placeholder="Twitter Url">
-                                </div>
-                                <div class="form-group">
-                                    <label for="instaurl">Instagram Url:</label>
-                                    <input type="text" class="form-control" id="instaurl" placeholder="Instagram Url">
-                                </div>
-                                <div class="form-group">
-                                    <label for="lurl">Linkedin Url:</label>
-                                    <input type="text" class="form-control" id="lurl" placeholder="Linkedin Url">
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
                 <div class="col-xl-9 col-lg-8">
                     <div class="card">
                         <div class="card-header d-flex justify-content-between">
                             <div class="header-title">
-                                <h4 class="card-title">New User Information</h4>
+                                <h4 class="card-title">新用户信息</h4>
                             </div>
                         </div>
                         <div class="card-body">
@@ -97,9 +36,9 @@
                                                    placeholder="真实姓名">
                                         </div>
                                         <div class="form-group col-md-6">
-                                            <label for="cname">用户网盘Id:</label>
+                                            <label for="cname">桶ID:</label>
                                             <input type="text" class="form-control" id="cname" name="bucketName"
-                                                   placeholder="桶名称">
+                                                   placeholder="桶ID默认为1,如不知道请填1">
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label for="mobno">手机号:</label>
@@ -115,6 +54,11 @@
                                             <label for="pno">Role(0管理员，1普通员工)</label>
                                             <input type="text" class="form-control" id="pno" placeholder="Role"
                                                    name="role">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="cname">用户网盘Id:默认请在用户文件夹下创建用户网盘</label>
+                                            <input type="text" class="form-control" id="p" name="folderId"
+                                                   placeholder="用户网盘Id">
                                         </div>
                                     </div>
                                     <hr>
@@ -136,11 +80,7 @@
                                                    placeholder="确认密码">
                                         </div>
                                     </div>
-                                    <div class="checkbox">
-                                        <label><input class="mr-2" type="checkbox">Enable
-                                            Two-Factor-Authentication</label>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">添加新用户</button>
+                                    <button type="submit" class="btn btn-primary">提交</button>
                                 </form>
                             </div>
                         </div>

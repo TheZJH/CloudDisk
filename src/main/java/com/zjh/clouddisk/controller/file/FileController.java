@@ -45,6 +45,7 @@ public class FileController {
 
     @Resource
     private FileRootMapper fileRootMapper;
+
     /**
      * 创建ObsClient实例
      */
@@ -224,6 +225,7 @@ public class FileController {
     @PostMapping("/file/upload")
     public String toUpdatePage(Integer folderId, @RequestParam("file") MultipartFile multipartFile, HttpSession session) throws IOException {
         //获取当前时间
+        User user = (User) session.getAttribute("loginUser");
         Date date = new Date();
         InputStream inputStream = multipartFile.getInputStream();
         String objectKey;
@@ -243,8 +245,9 @@ public class FileController {
             //最后一个点出现的位置
             int index = fileName.lastIndexOf(".");
             //获取文件后缀名
-            String postfix = fileName.substring(index, fileName.length());
+            String postfix = fileName.substring(index,fileName.length());
             int type = GetType.getType(postfix);
+            String username = user.getUsername();
             fileService.addFile(CloudFile.builder().
                     fileName(fileName)
                     .bucketId(1)
@@ -252,6 +255,7 @@ public class FileController {
                     .fileSize(GetSize.getSize(multipartFile.getSize()))
                     .postfix(postfix)
                     .fileType(type)
+                    .fileAuthor(username)
                     .createdTime(date).objectKey(objectKey).build());
         } else {
             String name1 = Md5Util.getMD5(multipartFile);
@@ -310,7 +314,6 @@ public class FileController {
             String name = file.getObjectKey();
             String prefix = folderService.findFolderPath(1, folderId);
             objectKey = prefix + name;
-
         }
         //上传文件有速度,在上传未完成前删除会报null,应该
         fileService.deleteFile(fileId);

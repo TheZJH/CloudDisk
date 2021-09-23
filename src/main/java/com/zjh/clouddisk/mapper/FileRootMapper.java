@@ -2,6 +2,7 @@ package com.zjh.clouddisk.mapper;
 
 import com.zjh.clouddisk.dao.CloudFile;
 import com.zjh.clouddisk.dao.Folder;
+import com.zjh.clouddisk.dao.User;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -62,4 +63,10 @@ public interface FileRootMapper {
     List<Folder> getFolderByGroup(@Param("folderId") List<Integer> folderId);
 
     //"<script>" + + "<foreach collection ='folderId' item='item' open='(' separator=',' close=')'>" + "#{item}" + " + "</script>"
+    @Update("update user set real_name=#{realName},user_name=#{userName},email=#{email},password=#{password},phone=#{phone} where user_id=#{userId}")
+    Integer updateUser(String realName, String userName, String email, String password, Integer phone, Integer userId);
+
+    @Select("select user_id from user where real_name=#{realName}")
+    Integer getUserId(String realName);
 }
+

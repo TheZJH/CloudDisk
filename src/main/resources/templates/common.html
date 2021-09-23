@@ -14,7 +14,6 @@
           th:href="@{/assets/vendor/line-awesome/dist/line-awesome/css/line-awesome.min.css}">
     <link rel="stylesheet" href="assets/vendor/remixicon/fonts/remixicon.css"
           th:href="@{/assets/vendor/remixicon/fonts/remixicon.css}">
-
     <!-- Viewer Plugin -->
     <!--PDF-->
     <link rel="stylesheet" href="assets/vendor/doc-viewer/include/pdf/pdf.viewer.css"
@@ -60,16 +59,17 @@
                         <ul id="dashboard" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
                         </ul>
                     </li>
-                    <li class=" ">
-                        <a href="#mydrive" class="collapsed" data-toggle="collapse" aria-expanded="false">
-                            <i class="las la-hdd"></i><span >我的群组</span>
+                    <li class="">
+                        <a href="" class="collapsed" data-toggle="collapse" aria-expanded="false">
+                            <i class="las la-hdd"></i><span>我的群组</span>
                             <i class="las la-angle-right iq-arrow-right arrow-active"></i>
                             <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
                         </a>
-                        <ul id="mydrive" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
+                        <ul id="" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle"
+                            th:each="group:${session.groupList}">
                             <li class=" ">
-                                <a>
-                                    <i class="lab la-blogger-b"></i><span>测试</span>
+                                <a th:href="@{/file(folderId=${group.folderId})}">
+                                    <i class="lab la-blogger-b"></i><span th:text="${group.folderName}">测试</span>
                                 </a>
                             </li>
                         </ul>
@@ -95,6 +95,7 @@
                         <ul id="page-delete" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
                         </ul>
                     </li>
+                    <!--用户为管理员才能显示-->
                     <li class="" th:if="${session.loginUser.role} eq 0">
                         <a href="#otherpage" class="collapsed" data-toggle="collapse" aria-expanded="false">
                             <i class="lab la-wpforms iq-arrow-left"></i><span>管理</span>
@@ -116,7 +117,7 @@
                                     </li>
                                     <li class=" ">
                                         <a th:href="@{/user/list}">
-                                            <i class="las la-list-alt"></i><span>User List</span>
+                                            <i class="las la-list-alt"></i><span>用户列表</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -135,19 +136,14 @@
                                     </li>
                                     <li class=" ">
                                         <a th:href="@{/bucket/list}">
-                                            <i class="las la-dna"></i><span>Bucket List</span>
+                                            <i class="las la-dna"></i><span>桶列表</span>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
                             <li class=" ">
-                                <a href="pages-blank-page.html">
-                                    <i class="las la-pager"></i><span>Blank Page</span>
-                                </a>
-                            </li>
-                            <li class=" ">
-                                <a href="pages-maintenance.html">
-                                    <i class="las la-cubes"></i><span>Maintenance</span>
+                                <a th:href="@{/group/list}">
+                                    <i class="las la-pager"></i><span>群组管理</span>
                                 </a>
                             </li>
                         </ul>
@@ -156,15 +152,13 @@
             </nav>
             <div class="sidebar-bottom">
                 <h4 class="mb-3" th:inline="text"><i class="las la-cloud mr-2"></i>
-                    Bucket:[[${session.bucket.getBucketName()}]]</h4>
+                    桶名称:[[${session.bucket.getBucketName()}]]</h4>
                 <!--内敛表达式-->
-                <p th:inline="text">[[${session.bucket.bucketSize}]]/ [[${session.bucket.bucketQuota}]]</p>
+                <p th:inline="text">已使用容量:[[${session.bucket.bucketSize}]]</p>
                 <div class="iq-progress-bar mb-3">
                       <span class="bg-primary iq-progress progress-1" data-percent="67">
                       </span>
                 </div>
-                <p>75% Full - 3.9 GB Free</p>
-                <a href="#" class="btn btn-outline-primary view-more mt-4">Test</a>
             </div>
             <div class="p-3"></div>
         </div>
@@ -395,27 +389,6 @@
 
     <!-- Chart Custom JavaScript -->
     <script src="assets/js/chart-custom.js" th:src="@{/assets/js/chart-custom.js}"></script>
-
-   <!-- &lt;!&ndash;PDF&ndash;&gt;
-    <script src="assets/vendor/doc-viewer/include/pdf/pdf.js"
-            th:src="@{/assets/vendor/doc-viewer/include/pdf/pdf.js}"></script>
-    &lt;!&ndash;Docs&ndash;&gt;
-    <script src="assets/vendor/doc-viewer/include/docx/jszip-utils.js"
-            th:src="@{/assets/vendor/doc-viewer/include/docx/jszip-utils.js}"></script>
-    <script src="assets/vendor/doc-viewer/include/docx/mammoth.browser.min.js"
-            th:src="@{/assets/vendor/doc-viewer/include/docx/mammoth.browser.min.js}"></script>
-    &lt;!&ndash;PPTX&ndash;&gt;
-    <script src="assets/vendor/doc-viewer/include/PPTXjs/js/filereader.js"
-            th:src="@{/assets/vendor/doc-viewer/include/PPTXjs/js/filereader.js}"></script>
-    <script src="assets/vendor/doc-viewer/include/PPTXjs/js/d3.min.js"
-            th:src="@{/assets/vendor/doc-viewer/include/PPTXjs/js/d3.min.js}"></script>
-    <script src="assets/vendor/doc-viewer/include/PPTXjs/js/nv.d3.min.js"
-            th:src="@{/assets/vendor/doc-viewer/include/PPTXjs/js/nv.d3.min.js}"></script>
-    <script src="assets/vendor/doc-viewer/include/PPTXjs/js/pptxjs.js"
-            th:src="@{/assets/vendor/doc-viewer/include/PPTXjs/js/pptxjs.js}"></script>
-    <script src="assets/vendor/doc-viewer/include/PPTXjs/js/divs2slides.js"
-            th:src="@{/assets/vendor/doc-viewer/include/PPTXjs/js/divs2slides.js}"></script>-->
-    <!--All Spreadsheet -->
     <script src="assets/vendor/doc-viewer/include/SheetJS/handsontable.full.min.js"
             th:src="@{/assets/vendor/doc-viewer/include/SheetJS/handsontable.full.min.js}"></script>
     <script src="assets/vendor/doc-viewer/include/SheetJS/xlsx.full.min.js"
