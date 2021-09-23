@@ -10,6 +10,7 @@ import com.zjh.clouddisk.dao.Folder;
 import com.zjh.clouddisk.dao.User;
 import com.zjh.clouddisk.mapper.BucketMapper;
 import com.zjh.clouddisk.mapper.FileMapper;
+import com.zjh.clouddisk.mapper.FileRootMapper;
 import com.zjh.clouddisk.mapper.FolderMapper;
 import com.zjh.clouddisk.util.CloudConfig;
 import com.zjh.clouddisk.util.GetSize;
@@ -45,6 +46,9 @@ public class LoginController {
     @Resource
     private FolderMapper folderMapper;
 
+    @Resource
+    private FileRootMapper fileRootMapper;
+
     final ObsClient obsClient = new ObsClient(CloudConfig.ak, CloudConfig.sk, CloudConfig.endPoint);
 
     /**
@@ -68,7 +72,7 @@ public class LoginController {
     @PostMapping("/login")
     public String login(@RequestParam("username") String username,
                         @RequestParam("password") String password,
-                        HttpSession session) {
+                        HttpSession session, Model model) {
         //根据用户名密码查询
         User login = userService.login(username, password);
         if (username.isEmpty() || password.isEmpty()) {
@@ -79,7 +83,6 @@ public class LoginController {
             //保存用户信息
             session.setAttribute("loginUser", login);
             session.setAttribute("msg", null);
-
             Integer role = login.getRole();
             //判断是否是管理员
             if (role.equals(1)) {
@@ -114,6 +117,12 @@ public class LoginController {
                 .bucketQuota(quota).build());
         List<CloudFile> files = fileMapper.indexFile();
         List<Folder> folders = folderMapper.indexFolder();
+        //查询group_user表,得到folderId
+        List<Integer> file = fileRootMapper.findFile(user.getUserId());
+        //查询folder表里group为0,是群组文件的文件夹
+        List<Folder> folderByGroup = fileRootMapper.getFolderByGroup(file);
+        //保存到model中
+        session.setAttribute("groupList", folderByGroup);
         model.addAttribute("indexFile", files);
         model.addAttribute("indexFolder", folders);
         return "index";

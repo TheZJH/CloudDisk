@@ -70,7 +70,7 @@ public interface FileMapper {
     @Update("update file set file_name =#{fileName} where file_id=#{fileId} and bucket_id=#{bucketId}")
     int updateFileName(Integer fileId, String fileName, Integer bucketId);
 
-    @Select("SELECT *FROM FILE  ORDER BY created_time DESC LIMIT 0,5")
+    @Select("SELECT *FROM file  ORDER BY created_time DESC LIMIT 0,5")
     @ResultMap("fileMap")
     List<CloudFile> indexFile();
 

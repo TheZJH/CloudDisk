@@ -7,6 +7,7 @@ import com.obs.services.model.fs.RenameRequest;
 import com.obs.services.model.fs.RenameResult;
 import com.zjh.clouddisk.util.CloudConfig;
 import com.zjh.clouddisk.util.GetSize;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,23 +24,6 @@ class CloudDiskApplicationTests {
     @Test
     public void delete() {
         obsClient.deleteObject("xpu", "test/");
-    }
-
-    @Test
-    public void rename() {
-        /**
-         * 华为OBS的
-         */
-        //如果是根目录
-        RenameRequest request = new RenameRequest();
-        //桶名
-        request.setBucketName("xpu");
-        //原对象完整文件名
-        request.setObjectKey("2.jpg");
-        //目标对象名
-        request.setNewObjectKey("1.jpg");
-        //更新OBS文件名
-        RenameResult result = obsClient.renameFile(request);
     }
 
     @Test
@@ -67,10 +51,5 @@ class CloudDiskApplicationTests {
         request.setObjectKey("win10 (1).jpg");
         TemporarySignatureResponse response = obsClient.createTemporarySignature(request);
         System.out.println(response.getSignedUrl());
-    }
-
-    @Test
-    public void Md5(MultipartFile file){
-
     }
 }

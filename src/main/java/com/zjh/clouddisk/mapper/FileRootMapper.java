@@ -47,4 +47,19 @@ public interface FileRootMapper {
             @Result(column = "bucket_id", property = "bucketId"),
     })
     CloudFile getObjectKey(String objectKey);
+
+    //group是关键字要修改,将group=0放在前面防止druid识别为sql注入
+    @Select("SELECT * FROM folder WHERE 'group'=0 and folder_id=#{folderId}")
+    @Results(id = "folderMap", value = {
+            @Result(id = true, column = "folder_id", property = "folderId"),
+            @Result(column = "folder_name", property = "folderName"),
+            @Result(column = "parent_folder_id", property = "parentFolderId"),
+            @Result(column = "bucket_id", property = "bucketId"),
+            @Result(column = "time", property = "time"),
+            @Result(column = "folder_path", property = "folderPath"),
+            @Result(column = "group", property = "group")
+    })
+    List<Folder> getFolderByGroup(@Param("folderId") List<Integer> folderId);
+
+    //"<script>" + + "<foreach collection ='folderId' item='item' open='(' separator=',' close=')'>" + "#{item}" + " + "</script>"
 }

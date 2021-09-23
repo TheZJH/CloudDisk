@@ -177,9 +177,11 @@ public class FileController {
         } else {
             String prefix = folderService.findFolderPath(1, folderId);
             CloudFile file = fileService.getFileByFileId(fileId, 1);
-            String name = file.getFileName();
-            fileName = prefix + name;
-            ObsObject obsObject = obsClient.getObject("xpu", file.getFileName());
+            //OBS下载路径
+            String name = prefix + file.getObjectKey();
+            //文件实际名
+            fileName = file.getFileName();
+            ObsObject obsObject = obsClient.getObject("xpu", name);
             InputStream input = obsObject.getObjectContent();
             try {
                 //缓冲文件输入流
@@ -224,20 +226,20 @@ public class FileController {
         //获取当前时间
         Date date = new Date();
         InputStream inputStream = multipartFile.getInputStream();
-        String objectKey = Md5Util.getMD5(multipartFile);
-        String fileName;
-        CloudFile objectKey1 = fileRootMapper.getObjectKey(objectKey);
-        if (objectKey1 != null) {
-            //数据库中已经有此文件
-            if (objectKey1.getParentFolderId() == folderId) {
-                //说明两个在同一个文件夹下
-                session.setAttribute("msg", "此文件已经存在于当前文件夹下");
-                return "pages-error";
+        String objectKey;
+        if (folderId == 0 || folderId == null) {
+            objectKey = Md5Util.getMD5(multipartFile);
+            CloudFile objectKey1 = fileRootMapper.getObjectKey(objectKey);
+            if (objectKey1 != null) {
+                //数据库中已经有此文件
+                if (objectKey1.getParentFolderId() == folderId) {
+                    //说明两个在同一个文件夹下
+                    session.setAttribute("msg", "此文件已经存在于当前文件夹下");
+                    return "pages-error";
+                }
             }
-        }
-        if (folderId == null || folderId == 0) {
             //当前目录为根目录
-            fileName = multipartFile.getOriginalFilename();
+            String fileName = multipartFile.getOriginalFilename();
             //最后一个点出现的位置
             int index = fileName.lastIndexOf(".");
             //获取文件后缀名
@@ -252,9 +254,22 @@ public class FileController {
                     .fileType(type)
                     .createdTime(date).objectKey(objectKey).build());
         } else {
+            String name1 = Md5Util.getMD5(multipartFile);
+            CloudFile objectKey1 = fileRootMapper.getObjectKey(name1);
+            if (objectKey1 != null) {
+                //数据库中已经有此文件
+                if (objectKey1.getParentFolderId() == folderId) {
+                    //说明两个在同一个文件夹下
+                    session.setAttribute("msg", "此文件已经存在于当前文件夹下");
+                    return "pages-error";
+                }
+            }
+            //文件夹路径
             String prefix = folderService.findFolderPath(1, folderId);
-            fileName = prefix + multipartFile.getOriginalFilename();
+            String fileName = multipartFile.getOriginalFilename();
             int index = fileName.lastIndexOf(".");
+            //上传路径
+            objectKey = prefix + name1;
             //获取文件后缀名
             String postfix = fileName.substring(index, fileName.length());
             int type = GetType.getType(postfix);
@@ -264,7 +279,7 @@ public class FileController {
                     .fileSize(GetSize.getSize(multipartFile.getSize()))
                     .parentFolderId(folderId)
                     .postfix(postfix)
-                    .fileType(type).objectKey(objectKey)
+                    .fileType(type).objectKey(name1)
                     .createdTime(date).build());
         }
         obsClient.putObject("xpu", objectKey, inputStream);
@@ -337,6 +352,7 @@ public class FileController {
                         .parentFolderId(folderId)
                         .bucketId(1)
                         .time(date)
+                        .group(0)
                         .folderPath(folderName + "/").build());
                 //在OBS下创建文件夹
                 objectKey = folderName + "/";
@@ -353,6 +369,7 @@ public class FileController {
                         .parentFolderId(folderId)
                         .bucketId(1)
                         .time(date)
+                        .group(1)
                         .folderPath(folderPath + folderName + "/").build());
                 Integer latestFolder = fileRootMapper.findLatestFolder();
                 //说明是个人文件夹

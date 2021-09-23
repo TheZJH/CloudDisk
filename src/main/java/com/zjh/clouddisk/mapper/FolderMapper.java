@@ -23,7 +23,8 @@ public interface FolderMapper {
             @Result(column = "parent_folder_id", property = "parentFolderId"),
             @Result(column = "bucket_id", property = "bucketId"),
             @Result(column = "time", property = "time"),
-            @Result(column = "folder_path", property = "folderPath")
+            @Result(column = "folder_path", property = "folderPath"),
+            @Result(column = "is_group",property = "group")
     })
     List<Folder> findAllRootFolder(Integer bucketId);
 
@@ -65,7 +66,7 @@ public interface FolderMapper {
      * @param folder
      * @return
      */
-    @Insert("insert into folder(folder_name,parent_folder_id,bucket_id,time,folder_path)values(#{folderName},#{parentFolderId},#{bucketId},#{time},#{folderPath})")
+    @Insert("insert into folder(folder_name,parent_folder_id,bucket_id,time,folder_path,is_group)values(#{folderName},#{parentFolderId},#{bucketId},#{time},#{folderPath},#{group})")
     int addFolder(Folder folder);
 
     /**
